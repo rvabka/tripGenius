@@ -1,8 +1,18 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-poppins: 'Poppins', sans-serif;
+  --font-rocknroll: 'RocknRoll One', sans-serif;
+}
+
+@theme {
+  --color-mainColor: #2c3e2e;
+  --color-primaryColor: #4a6b4a;
+  --color-accentColor: #1d3557;
+  --color-customGreen: #359572;
+  --color-accentOrange: #ffa73a;
 }
 
 @theme inline {
@@ -22,5 +32,34 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Poppins, sans-serif;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  height: 20px;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 15px;
+  visibility: none;
+}
+
+
+/* placeholder text style */
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #1e2939;
+}
+
+/* regular text style */
+input[type="date"].date-input--has-value::-webkit-datetime-edit-text,
+input[type="date"].date-input--has-value::-webkit-datetime-edit-month-field,
+input[type="date"].date-input--has-value::-webkit-datetime-edit-day-field,
+input[type="date"].date-input--has-value::-webkit-datetime-edit-year-field {
+  color: #1e2939;
 }
