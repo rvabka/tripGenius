@@ -3,10 +3,13 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 const Navbar = () => {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
-  const isLoggedIn = false;
+  const { data: session } = useSession();
+  console.log(session);
+  const isLoggedIn = session?.user;
 
   return (
     <div className="flex justify-between items-center mt-4 h-16 bg-transparent text-black relative p-2 px-6 shadow-md rounded-2xl">
@@ -61,18 +64,25 @@ const Navbar = () => {
           whileHover={{
             scale: 1.05,
             boxShadow: '0px 5px 15px rgba(29, 53, 87, 0.2)',
-            borderRadius: '0.5rem'
+            borderRadius: '0.75rem'
           }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.3 }}
         >
-          {!isLoggedIn && (
-            <Link
-              className="bg-accentOrange rounded-lg text-white px-5 py-2 inline-block text-base"
-              href="/login"
+          {isLoggedIn ? (
+            <button
+              className="p-2 text-base px-4 border-2 border-accentColor text-accentColor cursor-pointer rounded-xl"
+              onClick={() => signIn('google')}
             >
-              Login
-            </Link>
+              Sign In
+            </button>
+          ) : (
+            <button
+              className="p-2 text-base px-4 border-2 border-accentColor text-accentColor cursor-pointer rounded-xl"
+              onClick={() => signOut()}
+            >
+              Sign Out
+            </button>
           )}
         </motion.div>
       </div>

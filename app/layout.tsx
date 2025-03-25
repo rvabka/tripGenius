@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import Navbar from '@/components/Navbar';
 import BackgroundWrapper from '@/components/background_wrapper';
+import { SessionProvider } from 'next-auth/react';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -25,8 +26,10 @@ export default function RootLayout({
         <BackgroundWrapper>
           <main>
             <div className="max-w-[1200px] mx-auto">
-              <Navbar />
-              {children}
+              <SessionProvider>
+                <Navbar />
+                {children}
+              </SessionProvider>
             </div>
           </main>
         </BackgroundWrapper>
