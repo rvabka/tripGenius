@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import NavLink from '@/components/Navlink';
 import { motion, AnimatePresence } from 'framer-motion';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -75,24 +75,42 @@ const Navbar = () => {
               setHoveredLink={setHoveredLink}
             />
           ))}
+
         {isLoggedIn && (
           <Avatar className="-ml-0">
             <AvatarImage src={session?.user?.image || '/default-avatar.jpg'} />
             <AvatarFallback>{session?.user?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
         )}
-        <motion.button
-          whileHover={{
-            scale: 1.01,
-            boxShadow: '0px 5px 15px rgba(29, 53, 87, 0.2)'
-          }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.3 }}
-          className="p-2 text-base px-4 border-2 border-[#1d3557] text-[#1d3557] cursor-pointer rounded-xl"
-          onClick={isLoggedIn ? () => signOut() : () => signIn('google')}
-        >
-          {isLoggedIn ? 'Sign Out' : 'Sign In'}
-        </motion.button>
+
+        {isLoggedIn ? (
+          <motion.button
+            whileHover={{
+              scale: 1.03,
+              boxShadow: '0px 5px 15px rgba(29, 53, 87, 0.2)'
+            }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.3 }}
+            className="w-full py-2 px-4 rounded-xl flex items-center font-light justify-center bg-white border-2 border-[#1d3557] text-[#1d3557]"
+            onClick={() => signOut()}
+          >
+            Sign Out
+          </motion.button>
+        ) : (
+          <Link href="/sign-in" passHref>
+            <motion.div
+              whileHover={{
+                scale: 1.03,
+                boxShadow: '0px 5px 15px rgba(29, 53, 87, 0.2)'
+              }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.3 }}
+              className="w-full py-2 px-4 rounded-xl flex items-center font-light justify-center bg-[#1d3557] text-white cursor-pointer"
+            >
+              Sign In
+            </motion.div>
+          </Link>
+        )}
       </div>
 
       {/* Mobile Navigation */}

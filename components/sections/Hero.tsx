@@ -8,10 +8,10 @@ const Hero = () => {
     <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-between lg:-mt-20 md:py-2 px-4 md:px-8 max-w-7xl mx-auto">
       {/* Lewa część */}
       <div className="flex flex-col md:items-start items-center max-w-xl text-center md:text-left z-10">
-        <p className="text-base tracking-wider text-gray-500">
+        <p className="text-base tracking-wider text-gray-500 mt-4 md:mt-0">
           because AI plans trips intelligently 😍
         </p>
-        <h1 className={`text-4xl md:text-5xl font-bold leading-tight mt-3 mb-6 ${rocknroll.className}`}>
+        <h1 className={`text-4xl md:text-5xl font-bold leading-tight my-3 ${rocknroll.className}`}>
           Life is short and the world is{" "}
           <span className="text-orange-500 relative">
             Wide!
