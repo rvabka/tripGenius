@@ -1,19 +1,54 @@
 'use client';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import type React from 'react';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import NavLink from '@/components/Navlink';
+import { motion, AnimatePresence } from 'framer-motion';
 import { signIn, signOut, useSession } from 'next-auth/react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Menu, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import MobileNav from './MobileNavbar';
+
+const navLinks = [
+  { label: 'Plan Your Trip', href: 'trip', icon: '🗺️' },
+  { label: 'Saved Trips', href: 'saved', icon: '❤️' },
+  { label: 'Explore', href: 'explore', icon: '🔍' },
+  { label: 'Profile', href: 'user', icon: '👤' }
+];
 
 const Navbar = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
-  console.log(session);
-  const isLoggedIn = session?.user;
+  const isLoggedIn = !!session?.user;
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+    };
+
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [pathname]);
+
+  const handleMenuToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   return (
     <div className="flex justify-between items-center mt-4 h-16 bg-transparent text-black relative p-2 px-6 shadow-md rounded-2xl">
-      <Link href="/" className="flex justify-center items-center">
+      <Link href="/" className="flex items-center">
         <Image
           src="/tripgenius.png"
           alt="TripGenius Logo"
@@ -22,70 +57,69 @@ const Navbar = () => {
         />
         <p className="font-light tracking-wider text-xl">
           trip
-          <span className="font-bold tracking-normal text-customGreen drop-shadow-2xl">
+          <span className="font-bold tracking-normal text-[#359572] drop-shadow-2xl">
             Genius
           </span>
         </p>
       </Link>
-      <div className="flex items-center space-x-8 text-mainColor font-medium text-lg">
+
+      {/* Desktop Navigation */}
+      <div className="hidden md:flex items-center space-x-4 text-[#2c3e2e] font-medium text-lg">
         {isLoggedIn &&
-          [
-            { label: 'Plan Your Trip', href: 'trip' },
-            { label: 'Saved Trips', href: 'saved' },
-            { label: 'Explore', href: 'explore' },
-            { label: 'Profile', href: 'user' }
-          ].map(({ label, href }) => (
-            <div
+          navLinks.map(({ label, href }) => (
+            <NavLink
               key={href}
-              className="relative"
-              onMouseEnter={() => setHoveredLink(href)}
-              onMouseLeave={() => setHoveredLink(null)}
-            >
-              <Link href={`/${href}`} className="relative">
-                <span
-                  className={`transition duration-300 ${
-                    hoveredLink === href ? 'text-mainColor' : 'text-accentColor'
-                  }`}
-                >
-                  {label}
-                </span>
-              </Link>
-              <motion.div
-                className="absolute -bottom-1 left-1/2 h-0.5 bg-accentOrange translate-x-[-50%] rounded-full"
-                initial={{ width: 0 }}
-                animate={{
-                  width: hoveredLink === href ? '50%' : 0
-                }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
-              />
-            </div>
+              label={label}
+              href={href}
+              pathname={pathname}
+              setHoveredLink={setHoveredLink}
+            />
           ))}
-        <motion.div
+        {isLoggedIn && (
+          <Avatar className="-ml-0">
+            <AvatarImage src={session?.user?.image || '/default-avatar.jpg'} />
+            <AvatarFallback>{session?.user?.name?.charAt(0)}</AvatarFallback>
+          </Avatar>
+        )}
+        <motion.button
           whileHover={{
-            scale: 1.05,
-            boxShadow: '0px 5px 15px rgba(29, 53, 87, 0.2)',
-            borderRadius: '0.75rem'
+            scale: 1.01,
+            boxShadow: '0px 5px 15px rgba(29, 53, 87, 0.2)'
           }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.3 }}
+          className="p-2 text-base px-4 border-2 border-[#1d3557] text-[#1d3557] cursor-pointer rounded-xl"
+          onClick={isLoggedIn ? () => signOut() : () => signIn('google')}
         >
-          {isLoggedIn ? (
-            <button
-              className="p-2 text-base px-4 border-2 border-accentColor text-accentColor cursor-pointer rounded-xl"
-              onClick={() => signIn('google')}
-            >
-              Sign In
-            </button>
-          ) : (
-            <button
-              className="p-2 text-base px-4 border-2 border-accentColor text-accentColor cursor-pointer rounded-xl"
-              onClick={() => signOut()}
-            >
-              Sign Out
-            </button>
-          )}
-        </motion.div>
+          {isLoggedIn ? 'Sign Out' : 'Sign In'}
+        </motion.button>
       </div>
+
+      {/* Mobile Navigation */}
+      <button
+        className="md:hidden cursor-pointer text-[#1d3557] z-50"
+        onClick={handleMenuToggle}
+      >
+        {isMobileMenuOpen ? <X size={30} /> : <Menu size={30} />}
+      </button>
+
+      <MobileNav
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        navLinks={navLinks}
+      />
+
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black z-30 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
