@@ -1,9 +1,10 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
-import Navbar from '@/components/Navbar';
-import BackgroundWrapper from '@/components/background_wrapper';
 import { SessionProvider } from 'next-auth/react';
+
+import BackgroundWrapper from '@/components/background_wrapper';
+import Navbar from '@/components/Navbar';
 
 const poppins = Poppins({
   subsets: ['latin'],

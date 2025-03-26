@@ -47,7 +47,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex justify-between items-center mt-4 h-16 bg-transparent text-black relative p-2 px-6 shadow-md rounded-2xl">
+    <div className="flex justify-between items-center mt-4 h-16 bg-transparent text-black relative p-2 px-6 shadow-md rounded-2xl z-50">
       <Link href="/" className="flex items-center">
         <Image
           src="/tripgenius.png"
