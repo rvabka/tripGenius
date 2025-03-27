@@ -1,53 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { Checkbox } from '@/components/ui/checkbox';
 import GoogleSignIn from './google-sign.in';
-
-// Definicja schematu walidacji za pomocą Zod
-const signInSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: 'Email is required' })
-    .email({ message: 'Incorrect email format' }),
-  password: z.string().min(1, { message: 'Password is required' }),
-  rememberMe: z.boolean().optional()
-});
-
-type SignInFormValues = z.infer<typeof signInSchema>;
+import { signInAction } from './sign-in-action';
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset
-  } = useForm<SignInFormValues>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      rememberMe: false
-    }
-  });
-
-  const onSubmit = async (data: SignInFormValues) => {
-    console.log('Form submitted:', data);
-    // Tutaj normalnie wysłałbyś dane do API
-    // Symulacja opóźnienia logowania
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    reset();
-  };
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <div className="w-full max-w-md mx-auto p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700">
@@ -62,7 +28,36 @@ const SignInForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {formError && (
+        <div className="bg-red-50 text-red-500 p-3 rounded-md mb-4 text-base font-bold text-center">
+          {formError}
+        </div>
+      )}
+
+      <form
+        action={async (formData) => {
+          try {
+            setIsSubmitting(true);
+            const result = await signInAction(formData);
+            console.log('Sign-in result:', result);
+
+            if (!result.success) {
+              setFormError(
+                typeof result.errors?.form === 'string'
+                  ? result.errors.form
+                  : 'Authentication failed'
+              );
+            }
+            // Przekierowanie obsługuje server action w przypadku sukcesu
+          } catch (error) {
+            console.error('Sign-in error:', error);
+            setFormError('An unexpected error occurred');
+          } finally {
+            setIsSubmitting(false);
+          }
+        }}
+        className="space-y-6"
+      >
         <div className="space-y-2">
           <Label htmlFor="email" className="text-sm font-medium">
             Email
@@ -70,20 +65,14 @@ const SignInForm = () => {
           <div className="relative">
             <Input
               id="email"
+              name="email"
+              type="email"
               placeholder="your@email.com"
-              className={cn(
-                'pl-10 py-6',
-                errors.email
-                  ? 'border-red-500 focus-visible:ring-red-500'
-                  : 'focus-visible:ring-orange-500'
-              )}
-              {...register('email')}
+              className="pl-10 py-6 focus-visible:ring-orange-500"
+              required
             />
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           </div>
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-          )}
         </div>
 
         <div className="space-y-2">
@@ -101,15 +90,11 @@ const SignInForm = () => {
           <div className="relative">
             <Input
               id="password"
+              name="password"
               type={showPassword ? 'text' : 'password'}
               placeholder="Your password"
-              className={cn(
-                'pl-10 py-6',
-                errors.password
-                  ? 'border-red-500 focus-visible:ring-red-500'
-                  : 'focus-visible:ring-orange-500'
-              )}
-              {...register('password')}
+              className="pl-10 py-6 focus-visible:ring-orange-500"
+              required
             />
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <button
@@ -124,11 +109,13 @@ const SignInForm = () => {
               )}
             </button>
           </div>
-          {errors.password && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.password.message}
-            </p>
-          )}
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox id="rememberMe" name="rememberMe" />
+          <Label htmlFor="rememberMe" className="text-sm font-medium">
+            Remember me for 30 days
+          </Label>
         </div>
 
         <Button
@@ -189,7 +176,7 @@ const SignInForm = () => {
         </div>
       </div>
 
-      <div className="mt-6 ">
+      <div className="mt-6">
         <GoogleSignIn />
       </div>
     </div>

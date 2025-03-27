@@ -1,59 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Eye, EyeOff, Mail, Lock, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import GoogleSignIn from './google-sign.in';
-
-const signUpSchema = z
-  .object({
-    email: z
-      .string()
-      .min(1, { message: 'Email is required' })
-      .email({ message: 'Invalid email format' }),
-    password: z
-      .string()
-      .min(8, { message: 'Password must be at least 8 characters long' }),
-    confirmPassword: z
-      .string()
-      .min(1, { message: 'Password confirmation is required' })
-  })
-  .refine(data => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword']
-  });
-
-type SignUpFormValues = z.infer<typeof signUpSchema>;
+import { signUpAction } from './sign-up-action';
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset
-  } = useForm<SignUpFormValues>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: ''
-    }
-  });
-
-  const onSubmit = (data: SignUpFormValues) => {
-    console.log('Form submitted:', data);
-    reset();
-  };
+  const [formError, setFormError] = useState<string | null>(null);
 
   return (
     <div className="w-full max-w-md mx-auto p-8 rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700">
@@ -68,7 +27,31 @@ const SignUpForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {formError && (
+        <div className="bg-red-50 text-red-500 p-3 rounded-md mb-4 text-base font-bold text-center">
+          {formError}
+        </div>
+      )}
+      
+      <form
+        action={async formData => {
+          try {
+            const result = await signUpAction(formData);
+            console.log('Form action result:', result);
+            if (!result.success) {
+              setFormError(
+                typeof result.errors?.form === 'string'
+                  ? result.errors.form
+                  : 'Registration failed'
+              );
+            }
+          } catch (error) {
+            console.error('Form action error:', error);
+            setFormError('An unexpected error occurred');
+          }
+        }}
+        className="space-y-6"
+      >
         <div className="space-y-2">
           <Label htmlFor="email" className="text-sm font-medium">
             Email
@@ -76,20 +59,14 @@ const SignUpForm = () => {
           <div className="relative">
             <Input
               id="email"
+              name="email"
+              type="email"
               placeholder="your@email.com"
-              className={cn(
-                'pl-10 py-6',
-                errors.email
-                  ? 'border-red-500 focus-visible:ring-red-500'
-                  : 'focus-visible:ring-orange-500'
-              )}
-              {...register('email')}
+              className="pl-10 py-6 focus-visible:ring-orange-500"
+              required
             />
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           </div>
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-          )}
         </div>
 
         <div className="space-y-2">
@@ -99,15 +76,12 @@ const SignUpForm = () => {
           <div className="relative">
             <Input
               id="password"
+              name="password"
               type={showPassword ? 'text' : 'password'}
               placeholder="At least 8 characters"
-              className={cn(
-                'pl-10 py-6',
-                errors.password
-                  ? 'border-red-500 focus-visible:ring-red-500'
-                  : 'focus-visible:ring-orange-500'
-              )}
-              {...register('password')}
+              className="pl-10 py-6 focus-visible:ring-orange-500"
+              minLength={8}
+              required
             />
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <button
@@ -122,11 +96,6 @@ const SignUpForm = () => {
               )}
             </button>
           </div>
-          {errors.password && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.password.message}
-            </p>
-          )}
         </div>
 
         <div className="space-y-2">
@@ -136,15 +105,11 @@ const SignUpForm = () => {
           <div className="relative">
             <Input
               id="confirmPassword"
+              name="confirmPassword"
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder="Repeat password"
-              className={cn(
-                'pl-10 py-6',
-                errors.confirmPassword
-                  ? 'border-red-500 focus-visible:ring-red-500'
-                  : 'focus-visible:ring-orange-500'
-              )}
-              {...register('confirmPassword')}
+              className="pl-10 py-6 focus-visible:ring-orange-500"
+              required
             />
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <button
@@ -159,11 +124,6 @@ const SignUpForm = () => {
               )}
             </button>
           </div>
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.confirmPassword.message}
-            </p>
-          )}
         </div>
 
         <Button

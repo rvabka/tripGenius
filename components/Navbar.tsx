@@ -25,6 +25,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
+
   const pathname = usePathname();
 
   useEffect(() => {

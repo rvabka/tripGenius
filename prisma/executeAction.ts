@@ -7,23 +7,38 @@ type Options<T> = {
 
 const executeAction = async <T>({
   actionFn,
-  successMessage = 'The actions was successful'
-}: Options<T>): Promise<{ success: boolean; message: string }> => {
+  successMessage = 'The action was successful'
+}: Options<T>): Promise<{
+  success: boolean;
+  message: string;
+  error?: string;
+  data?: T;
+}> => {
   try {
-    await actionFn();
+    const data = await actionFn();
 
     return {
       success: true,
-      message: successMessage
+      message: successMessage,
+      data
     };
   } catch (error) {
+    // Obsługa przekierowań
     if (isRedirectError(error)) {
       throw error;
     }
 
+    // Logowanie błędu z pełnymi szczegółami
+    console.error('Execute action error:', error);
+
+    // Zwracamy oryginalny błąd zamiast generycznego
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred';
+
     return {
       success: false,
-      message: 'An error has occurred during executing the action'
+      message: errorMessage,
+      error: errorMessage
     };
   }
 };
