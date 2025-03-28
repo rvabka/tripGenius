@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname } from 'next/navigation';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 
 const sidebarVariants = {
   closed: {
@@ -38,14 +38,13 @@ interface MobileNavProps {
   navLinks: Array<{
     label: string;
     href: string;
-    icon: React.ReactNode;
+    icon: string;
   }>;
   onClose: () => void;
 }
 
-const MobileNav = ({ isOpen, navLinks }: MobileNavProps) => {
-  const { data: session } = useSession();
-  const isLoggedIn = !!session?.user;
+const MobileNav = ({ isOpen, navLinks, onClose }: MobileNavProps) => {
+  const { user } = useUser();
   const pathname = usePathname();
 
   return (
@@ -77,41 +76,31 @@ const MobileNav = ({ isOpen, navLinks }: MobileNavProps) => {
               </div>
             </div>
 
-            {isLoggedIn && (
+            <SignedIn>
               <motion.div
                 variants={itemVariants}
                 className="p-6 border-b border-gray-100 flex items-center"
               >
-                <Avatar className="h-12 w-12">
-                  <AvatarImage
-                    src={session?.user?.image || '/default-avatar.jpg'}
-                  />
-                  <AvatarFallback>
-                    {session?.user?.name?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
+                <UserButton afterSignOutUrl="/" />
                 <div className="ml-4">
-                  <p className="font-medium text-[#2c3e2e]">
-                    {session?.user?.name}
-                  </p>
+                  <p className="font-medium text-[#2c3e2e]">{user?.fullName}</p>
                   <p className="text-sm text-gray-500">
-                    {session?.user?.email}
+                    {user?.emailAddresses[0]?.emailAddress}
                   </p>
                 </div>
               </motion.div>
-            )}
 
-            <div className="flex-1 overflow-y-auto py-4">
-              {isLoggedIn &&
-                navLinks.map(({ label, href, icon }, index) => (
+              <div className="flex-1 overflow-y-auto py-4">
+                {navLinks.map(({ label, href, icon }, index) => (
                   <motion.div
                     key={href}
                     variants={itemVariants}
                     custom={index}
                     className="px-6 py-3"
+                    onClick={onClose}
                   >
                     <Link
-                      href={href}
+                      href={`/${href}`}
                       className={`flex items-center space-x-4 p-2 rounded-xl transition-colors ${
                         pathname === `/${href}`
                           ? 'bg-[#4a6b4a]/10 text-[#359572] font-medium'
@@ -129,26 +118,22 @@ const MobileNav = ({ isOpen, navLinks }: MobileNavProps) => {
                     </Link>
                   </motion.div>
                 ))}
-            </div>
+              </div>
+            </SignedIn>
+
+            <SignedOut>
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-gray-500">
+                  Please sign in to access features
+                </p>
+              </div>
+            </SignedOut>
 
             <motion.div
               variants={itemVariants}
               className="p-6 border-t border-gray-100 mt-auto"
             >
-              {isLoggedIn ? (
-                <motion.button
-                  whileHover={{
-                    scale: 1.03,
-                    boxShadow: '0px 5px 15px rgba(29, 53, 87, 0.2)'
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full py-2 px-4 rounded-xl flex items-center font-light justify-center bg-white border-2 border-[#1d3557] text-[#1d3557]"
-                  onClick={() => signOut()}
-                >
-                  Sign Out
-                </motion.button>
-              ) : (
+              <SignedOut>
                 <Link href="/sign-in" passHref>
                   <motion.div
                     whileHover={{
@@ -162,7 +147,7 @@ const MobileNav = ({ isOpen, navLinks }: MobileNavProps) => {
                     Sign In
                   </motion.div>
                 </Link>
-              )}
+              </SignedOut>
             </motion.div>
           </div>
         </motion.div>

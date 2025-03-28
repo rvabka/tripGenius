@@ -1,16 +1,14 @@
 'use client';
-import { useState, useEffect } from 'react';
-import type React from 'react';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import NavLink from '@/components/Navlink';
 import { motion, AnimatePresence } from 'framer-motion';
-import { signOut, useSession } from 'next-auth/react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import MobileNav from './MobileNavbar';
+import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 
 const navLinks = [
   { label: 'Plan Your Trip', href: 'trip', icon: '🗺️' },
@@ -20,27 +18,10 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [, setHoveredLink] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { data: session } = useSession();
-  const isLoggedIn = !!session?.user;
-
   const pathname = usePathname();
-
-  useEffect(() => {
-    const handleClickOutside = () => {
-      if (isMobileMenuOpen) setIsMobileMenuOpen(false);
-    };
-
-    if (isMobileMenuOpen) {
-      setIsMobileMenuOpen(false);
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [pathname]);
+  const { user } = useUser();
 
   const handleMenuToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -66,8 +47,8 @@ const Navbar = () => {
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center space-x-4 text-[#2c3e2e] font-medium text-lg">
-        {isLoggedIn &&
-          navLinks.map(({ label, href }) => (
+        <SignedIn>
+          {navLinks.map(({ label, href }) => (
             <NavLink
               key={href}
               label={label}
@@ -77,27 +58,13 @@ const Navbar = () => {
             />
           ))}
 
-        {isLoggedIn && (
-          <Avatar className="-ml-0">
-            <AvatarImage src={session?.user?.image || '/default-avatar.jpg'} />
-            <AvatarFallback>{session?.user?.name?.charAt(0)}</AvatarFallback>
-          </Avatar>
-        )}
+          <div>
+            <p className="font-medium text-[#2c3e2e]">{user?.fullName}</p>
+          </div>
+          <UserButton afterSignOutUrl="/" />
+        </SignedIn>
 
-        {isLoggedIn ? (
-          <motion.button
-            whileHover={{
-              scale: 1.03,
-              boxShadow: '0px 5px 15px rgba(29, 53, 87, 0.2)'
-            }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ duration: 0.3 }}
-            className="w-full py-2 px-4 rounded-xl flex items-center font-light justify-center bg-white border-2 border-[#1d3557] text-[#1d3557]"
-            onClick={() => signOut()}
-          >
-            Sign Out
-          </motion.button>
-        ) : (
+        <SignedOut>
           <Link href="/sign-in" passHref>
             <motion.div
               whileHover={{
@@ -111,7 +78,7 @@ const Navbar = () => {
               Sign In
             </motion.div>
           </Link>
-        )}
+        </SignedOut>
       </div>
 
       {/* Mobile Navigation */}
