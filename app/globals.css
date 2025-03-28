@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -105,18 +105,18 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 /* placeholder text style */
-input[type="date"]::-webkit-datetime-edit-text,
-input[type="date"]::-webkit-datetime-edit-month-field,
-input[type="date"]::-webkit-datetime-edit-day-field,
-input[type="date"]::-webkit-datetime-edit-year-field {
+input[type='date']::-webkit-datetime-edit-text,
+input[type='date']::-webkit-datetime-edit-month-field,
+input[type='date']::-webkit-datetime-edit-day-field,
+input[type='date']::-webkit-datetime-edit-year-field {
   color: #1e2939;
 }
 
 /* regular text style */
-input[type="date"].date-input--has-value::-webkit-datetime-edit-text,
-input[type="date"].date-input--has-value::-webkit-datetime-edit-month-field,
-input[type="date"].date-input--has-value::-webkit-datetime-edit-day-field,
-input[type="date"].date-input--has-value::-webkit-datetime-edit-year-field {
+input[type='date'].date-input--has-value::-webkit-datetime-edit-text,
+input[type='date'].date-input--has-value::-webkit-datetime-edit-month-field,
+input[type='date'].date-input--has-value::-webkit-datetime-edit-day-field,
+input[type='date'].date-input--has-value::-webkit-datetime-edit-year-field {
   color: #1e2939;
 }
 
@@ -161,4 +161,14 @@ input[type="date"].date-input--has-value::-webkit-datetime-edit-year-field {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.cl-userButtonTrigger {
+  width: 36px !important; /* Dostosuj rozmiar */
+  height: 36px !important;
+}
+
+.cl-userButtonAvatarBox {
+  width: 36px !important;
+  height: 36px !important;
 }

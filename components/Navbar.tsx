@@ -8,20 +8,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import MobileNav from './MobileNavbar';
-import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 const navLinks = [
   { label: 'Plan Your Trip', href: 'trip', icon: '🗺️' },
   { label: 'Saved Trips', href: 'saved', icon: '❤️' },
-  { label: 'Explore', href: 'explore', icon: '🔍' },
-  { label: 'Profile', href: 'user', icon: '👤' }
+  { label: 'Explore', href: 'explore', icon: '🔍' }
 ];
 
 const Navbar = () => {
   const [, setHoveredLink] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { user } = useUser();
 
   const handleMenuToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -58,9 +56,6 @@ const Navbar = () => {
             />
           ))}
 
-          <div>
-            <p className="font-medium text-[#2c3e2e]">{user?.fullName}</p>
-          </div>
           <UserButton afterSignOutUrl="/" />
         </SignedIn>
 

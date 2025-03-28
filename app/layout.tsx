@@ -1,7 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
-import { SessionProvider } from 'next-auth/react';
 import { ClerkProvider } from '@clerk/nextjs';
 
 import BackgroundWrapper from '@/components/background_wrapper';
@@ -29,10 +28,8 @@ export default function RootLayout({
           <BackgroundWrapper>
             <main>
               <div className="max-w-[1200px] mx-auto">
-                <SessionProvider>
-                  <Navbar />
-                  {children}
-                </SessionProvider>
+                <Navbar />
+                {children}
               </div>
             </main>
           </BackgroundWrapper>

@@ -142,6 +142,7 @@ const MobileNav = ({ isOpen, navLinks, onClose }: MobileNavProps) => {
                     }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ duration: 0.3 }}
+                    onClick={onClose}
                     className="w-full py-2 px-4 rounded-xl flex items-center font-light justify-center bg-[#1d3557] text-white cursor-pointer"
                   >
                     Sign In
