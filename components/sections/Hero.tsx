@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils"
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-between lg:-mt-20 md:py-2 px-4 md:px-8 max-w-7xl mx-auto">
+    <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-between lg:-mt-14  mx-auto">
       {/* Lewa część */}
       <div className="flex flex-col md:items-start items-center max-w-xl text-center md:text-left z-10">
         <p className="text-base tracking-wider text-gray-500 mt-4 md:mt-0">
           because AI plans trips intelligently 😍
         </p>
-        <h1 className={`text-4xl md:text-5xl font-bold leading-tight my-3 ${rocknroll.className}`}>
+        <h1 className={`text-4xl md:text-5xl font-bold leading-tight my-1 ${rocknroll.className}`}>
           Life is short and the world is{" "}
           <span className="text-orange-500 relative">
             Wide!
@@ -21,7 +21,7 @@ const Hero = () => {
 
         <div className="w-20 h-1 bg-orange-500 rounded my-4 md:my-6 mx-auto md:mx-0"></div>
 
-        <div className="mb-10 text-gray-600 dark:text-gray-300">
+        <div className="mb-4 text-gray-600 dark:text-gray-300">
           Discover amazing destinations with our AI-powered travel planner that creates personalized itineraries just
           for you.
         </div>
@@ -86,7 +86,6 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Dekoracyjne elementy tła */}
       <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-orange-50 dark:bg-orange-900/10 rounded-full filter blur-3xl opacity-30 -z-10"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-50 dark:bg-blue-900/10 rounded-full filter blur-3xl opacity-30 -z-10"></div>
     </section>

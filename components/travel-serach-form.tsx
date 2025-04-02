@@ -41,7 +41,7 @@ export default function TravelSearchForm() {
         <div className="flex flex-col md:flex-row w-full gap-4">
           <div className="relative flex items-center w-full px-4 py-3 border border-gray-200 rounded-lg">
             <Calendar
-              className="text-orange-500 mr-3 flex-shrink-0 pointer-events-none mt-5 md:mt-0"
+              className="text-accentOrange mr-3 flex-shrink-0 pointer-events-none mt-5 md:mt-0"
               size={20}
             />
             <div className="flex flex-col w-full relative">
@@ -77,7 +77,7 @@ export default function TravelSearchForm() {
         </div>
 
         {/* Search Button */}
-        <button className="flex items-center justify-center bg-orange-500 hover:bg-orange-600 transition-colors cursor-pointer text-white rounded-full p-4 w-14 h-14">
+        <button className="flex items-center justify-center bg-accentOrange hover:bg-orange-600 transition-colors cursor-pointer text-white rounded-full p-4 w-14 h-14">
           <Search size={25} />
         </button>
       </form>

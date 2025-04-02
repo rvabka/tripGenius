@@ -25,13 +25,13 @@ const TopValues = () => {
     <section className="py-12 max-w-7xl mx-auto">
       <div className="flex flex-wrap items-start gap-6 md:gap-8">
         <div className="w-full sm:w-64 flex-shrink-0 mb-6 sm:mb-0">
-          <p className="text-sm font-bold tracking-wider text-orange-500 uppercase">
+          <p className="text-sm font-bold tracking-wider text-accentOrange uppercase">
             what we serve
           </p>
           <h2 className="text-3xl font-bold leading-tight mt-1">
             Smart Travel Planning<span className="ml-2 animate-pulse">🔥</span>
           </h2>
-          <div className="w-20 h-1 bg-orange-500 rounded my-3"></div>
+          <div className="w-20 h-1 bg-accentOrange rounded my-3"></div>
           <p className="text-gray-600 dark:text-gray-300">
             Personalized AI-powered trip plans tailored to your preferences.
           </p>
@@ -45,7 +45,7 @@ const TopValues = () => {
               'bg-white dark:bg-gray-800 hover:shadow-lg',
               'border border-gray-100 dark:border-gray-700',
               'hover:border-orange-200 dark:hover:border-orange-800',
-              'flex-1 min-w-[250px] sm:max-w-[280px]'
+              'flex-1 w-64'
             )}
           >
             <div className="flex items-center mb-3">
