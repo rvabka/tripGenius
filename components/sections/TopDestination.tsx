@@ -7,6 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious
 } from '@/components/ui/carousel';
+import { DollarSign, Send } from 'lucide-react';
 
 const tempData = [
   {
@@ -57,23 +58,36 @@ const TopDestination = () => {
       <div className="">
         <Carousel>
           <CarouselContent>
-            {tempData.map(({ id, name, image }) => (
+            {tempData.map(({ id, name, image, price, tripLength }) => (
               <CarouselItem
                 key={id}
-                className="basis-1/2 md:basis-1/3 flex items-center justify-center"
+                className="basis-1/1 sm:basis-1/2 lg:basis-1/3 flex items-center justify-center"
               >
-                <div className="bg-white p-3 shadow-xl rounded-3xl">
-                  <Image
-                    src={image}
-                    alt={name}
-                    width={400}
-                    height={400}
-                    className="rounded-3xl object-cover w-64 md:w-75 aspect-video"
-                  />
+                <div className="group bg-white p-3 shadow-md hover:shadow-xl rounded-3xl transition-all duration-300 max-w-xs">
+                  <div className="overflow-hidden rounded-2xl">
+                    <Image
+                      src={image || '/placeholder.svg'}
+                      alt={name}
+                      width={400}
+                      height={300}
+                      className="rounded-2xl object-cover w-full aspect-video transform group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
 
-                  <p className='block w-full text-lg font-medium mt-3'>{name}</p>
+                  <h3 className="block w-full text-lg font-medium mt-3 mb-2 line-clamp-1">
+                    {name}
+                  </h3>
+
                   <div className="flex items-center justify-between w-full">
-                    <p></p>
+                    <div className="flex items-center justify-center flex-row text-amber-500 font-medium gap-1 bg-amber-50 px-2 py-1 rounded-full">
+                      <DollarSign size={16} className="text-amber-500" />
+                      <span>{price}</span>
+                    </div>
+
+                    <div className="flex items-center justify-center flex-row text-gray-600 font-medium gap-1 bg-gray-50 px-2 py-1 rounded-full">
+                      <Send size={16} className="text-gray-500" />
+                      <span>{tripLength} Days trip</span>
+                    </div>
                   </div>
                 </div>
               </CarouselItem>
