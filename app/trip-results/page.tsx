@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
 
 interface TripPlan {
   summary: string;
   transportation: string;
-  dailyPlans: Array<{ day: string; activities: string }>;
+  dailyPlans: string;
   accommodation: string;
   localCuisine: string;
   practicalTips: string;
@@ -30,7 +31,7 @@ export default function TripResults() {
     }
   }, []);
 
-  console.log(tripPlan)
+  console.log(tripPlan);
 
   const tabs = [
     { id: 'summary', label: 'Podsumowanie' },
@@ -66,7 +67,7 @@ export default function TripResults() {
 
       <div className="border-b mb-6">
         <div className="flex overflow-x-auto">
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -84,58 +85,63 @@ export default function TripResults() {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         {activeTab === 'summary' && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Podsumowanie trasy</h2>
-            <p className="whitespace-pre-line">{tripPlan.summary}</p>
+          <div className="prose">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Podsumowanie trasy
+            </h2>
+            <ReactMarkdown>{tripPlan.summary}</ReactMarkdown>
           </div>
         )}
 
         {activeTab === 'daily' && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Plan dzienny</h2>
-            <div className="space-y-6">
-              {tripPlan.dailyPlans.map((day, index) => (
-                <div key={index} className="border-l-4 border-blue-500 pl-4">
-                  <h3 className="font-medium text-lg">{day.day}</h3>
-                  <p className="whitespace-pre-line mt-2">{day.activities}</p>
-                </div>
-              ))}
-            </div>
+          <div className="prose">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Plan dzienny
+            </h2>
+            <ReactMarkdown>{tripPlan.dailyPlans}</ReactMarkdown>
           </div>
         )}
 
         {activeTab === 'transport' && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Transport</h2>
-            <p className="whitespace-pre-line">{tripPlan.transportation}</p>
+          <div className="prose">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Transport
+            </h2>
+            <ReactMarkdown>{tripPlan.transportation}</ReactMarkdown>
           </div>
         )}
 
         {activeTab === 'accommodation' && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Noclegi</h2>
-            <p className="whitespace-pre-line">{tripPlan.accommodation}</p>
+          <div className="prose">
+            <h2 className="text-2xl font-semibold mb-4 text-center">Noclegi</h2>
+            <ReactMarkdown>{tripPlan.accommodation}</ReactMarkdown>
           </div>
         )}
 
         {activeTab === 'cuisine' && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Lokalna kuchnia</h2>
-            <p className="whitespace-pre-line">{tripPlan.localCuisine}</p>
+          <div className="prose">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Lokalna kuchnia
+            </h2>
+            <ReactMarkdown>{tripPlan.localCuisine}</ReactMarkdown>
           </div>
         )}
 
         {activeTab === 'tips' && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Porady praktyczne</h2>
-            <p className="whitespace-pre-line">{tripPlan.practicalTips}</p>
+          <div className="prose">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Porady praktyczne
+            </h2>
+            <ReactMarkdown>{tripPlan.practicalTips}</ReactMarkdown>
           </div>
         )}
 
         {activeTab === 'budget' && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Szacowany budżet</h2>
-            <p className="whitespace-pre-line">{tripPlan.estimatedBudget}</p>
+          <div className="prose">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Szacowany budżet
+            </h2>
+            <ReactMarkdown>{tripPlan.estimatedBudget}</ReactMarkdown>
           </div>
         )}
       </div>

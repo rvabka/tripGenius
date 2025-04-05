@@ -60,7 +60,7 @@ const Loader = () => {
       </div>
       <Progress value={progress} className="w-1/2 mt-3 mb-1" />
 
-      <p className="text-2xl font-light text-white">
+      <p className="text-2xl font-light text-white text-center">
         {currentStatus.current}{' '}
         <span className="animate-pulse font-medium text-4xl">...</span>
       </p>
