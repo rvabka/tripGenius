@@ -5,12 +5,9 @@ import { cn } from "@/lib/utils"
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-between lg:-mt-14  mx-auto">
-      {/* Lewa część */}
-      <div className="flex flex-col md:items-start items-center max-w-xl text-center md:text-left z-10">
-        <p className="text-base tracking-wider text-gray-500 mt-4 md:mt-0">
-          because AI plans trips intelligently 😍
-        </p>
+    <section className="relative min-h-screen flex flex-col lg:flex-row items-center justify-between lg:-mt-14 container mx-auto px-4 md:px-6">
+      <div className="flex flex-col md:items-center lg:items-start max-w-xl text-center lg:w-1/2 lg:text-left z-10 lg:pr-8">
+        <p className="text-base tracking-wider text-gray-500 mt-4 lg:mt-0">because AI plans trips intelligently 😍</p>
         <h1 className={`text-4xl md:text-5xl font-bold leading-tight my-1 ${rocknroll.className}`}>
           Life is short and the world is{" "}
           <span className="text-orange-500 relative">
@@ -19,7 +16,7 @@ const Hero = () => {
           </span>
         </h1>
 
-        <div className="w-20 h-1 bg-orange-500 rounded my-4 md:my-6 mx-auto md:mx-0"></div>
+        <div className="w-20 h-1 bg-orange-500 rounded my-4 md:my-6 mx-auto lg:mx-0"></div>
 
         <div className="mb-4 text-gray-600 dark:text-gray-300">
           Discover amazing destinations with our AI-powered travel planner that creates personalized itineraries just
@@ -29,18 +26,16 @@ const Hero = () => {
         <TravelSearchForm />
       </div>
 
-      {/* Prawa część */}
-      <div className="md:relative w-full md:w-1/2 flex justify-center items-center mt-10 md:mt-0 mb-40 md:mb-0">
-        {/* Zdjęcia */}
-        <div className="relative flex flex-col gap-6 mr-36 md:mr-0">
-          <div className="relative z-10 transition-all duration-300 hover:scale-105 hover:rotate-2">
+      <div className="w-full lg:w-1/2 flex justify-center items-center mt-10 lg:mt-0 mb-20 lg:mb-0 py-10 lg:py-0">
+        <div className="relative w-full max-w-md h-[400px] md:h-[500px] lg:h-[600px]">
+          <div className="absolute left-0 md:left-8 lg:left-0 top-0 z-10 transition-all duration-300 hover:scale-105 hover:rotate-2">
             <Image
               src={"/mainPage1.jpeg"}
               alt="trip"
               width={300}
-              height={300}
+              height={400}
               className={cn(
-                "w-80 aspect-2/3 object-cover rounded-3xl shadow-lg z-10",
+                "w-60 md:w-64 lg:w-80 aspect-[2/3] object-cover rounded-3xl shadow-lg",
                 "border-4 border-white dark:border-gray-800",
                 "hover:shadow-orange-200 dark:hover:shadow-orange-900/30",
               )}
@@ -71,18 +66,20 @@ const Hero = () => {
             })}
           </div>
 
-          <Image
-            src={"/mainPage2.jpeg"}
-            alt="trip"
-            width={300}
-            height={300}
-            className={cn(
-              "absolute right-[-150px] top-40 w-70 aspect-2/3 object-cover",
-              "rounded-3xl shadow-lg z-0 transition-all duration-300",
-              "border-4 border-orange-500 dark:border-orange-700",
-              "hover:scale-105 hover:-rotate-2 hover:shadow-orange-200",
-            )}
-          />
+          <div className="absolute right-0 md:right-8 lg:right-0 top-1/3 z-0 transition-all duration-300 hover:scale-105 hover:-rotate-2">
+            <Image
+              src={"/mainPage2.jpeg"}
+              alt="trip"
+              width={250}
+              height={350}
+              className={cn(
+                "w-52 md:w-56 lg:w-64 aspect-[2/3] object-cover",
+                "rounded-3xl shadow-lg",
+                "border-4 border-orange-500 dark:border-orange-700",
+                "hover:shadow-orange-200",
+              )}
+            />
+          </div>
         </div>
       </div>
 
@@ -93,4 +90,3 @@ const Hero = () => {
 }
 
 export default Hero
-

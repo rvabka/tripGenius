@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
+import Loader from '@/components/Loader';
 
 interface TripPlan {
   summary: string;
@@ -45,27 +46,26 @@ export default function TripResults() {
 
   if (!tripPlan) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-lg">Ładowanie planu podróży...</p>
-        </div>
-      </div>
+      <Loader addInformation={false} addText={'Ładowanie planu podróży...'} />
     );
   }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-center">
-          Twój plan podróży: {from} → {to}
+        <h1 className="flex flex-col text-3xl font-bold text-center gap-2">
+          Twój plan podróży:
+          <div>
+            <span className="font-light text-accentOrange">{from}</span> →{' '}
+            <span className="font-light text-accentOrange">{to}</span>
+          </div>
         </h1>
-        <p className="text-center text-gray-600 mt-2">
+        <p className="text-center text-gray-600 mt-3">
           Wygenerowano przez TripGenius AI
         </p>
       </div>
 
-      <div className="border-b mb-6">
+      <div className="flex justify-center items-center border-b mb-6">
         <div className="flex overflow-x-auto">
           {tabs.map(tab => (
             <button
@@ -83,7 +83,7 @@ export default function TripResults() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="flex justify-center items-center bg-white rounded-lg shadow-md p-6">
         {activeTab === 'summary' && (
           <div className="prose">
             <h2 className="text-2xl font-semibold mb-4 text-center">

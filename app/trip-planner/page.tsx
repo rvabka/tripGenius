@@ -357,7 +357,7 @@ export default function TripPlanner() {
           >
             {isLoading ? 'Planning a trip...' : 'Plan my trip'}
           </button>
-          {isLoading && <Loader />}
+          {isLoading && <Loader addInformation={true} />}
         </div>
       </form>
     </div>

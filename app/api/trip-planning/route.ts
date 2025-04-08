@@ -26,11 +26,7 @@ export async function POST(request: NextRequest) {
     );
 
     const result = await geminiModel.generateContent(prompt);
-    const text = result.response
-      .text()
-      .trim()
-      .replace(/^\*+\s*/, '')
-      .replace(/\s*\*+$/, '');
+    const text = result.response.text().trim();
 
     const tripPlan = parseTripPlanFromText(text);
 

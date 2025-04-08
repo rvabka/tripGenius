@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Progress } from './ui/progress';
 
-const Loader = () => {
+const Loader = ({ addInformation, addText }: { addInformation: boolean, addText?: string }) => {
+  
   const [progress, setProgress] = useState<number>(0);
 
   const statusUpdates = [
@@ -58,11 +59,19 @@ const Loader = () => {
         <div className="absolute top-0 left-0 animate-ping opacity-75 rounded-full border-2 border-[#d4d4d4] size-8" />
         <div className="absolute top-0 left-0 animate-pulse opacity-50 size-8 rounded-full border border-[#868686]" />
       </div>
-      <Progress value={progress} className="w-1/2 mt-3 mb-1" />
 
-      <p className="text-2xl font-light text-white text-center">
-        {currentStatus.current}{' '}
-        <span className="animate-pulse font-medium text-4xl">...</span>
+      {addInformation && (
+        <>
+          <Progress value={progress} className="w-1/2 mt-3 mb-1" />
+
+          <p className="text-2xl font-light text-white text-center">
+            {currentStatus.current}{' '}
+            <span className="animate-pulse font-medium text-4xl">...</span>
+          </p>
+        </>
+      )}
+      <p className="text-2xl font-light text-white text-center mt-4">
+        {addText}
       </p>
     </div>
   );
