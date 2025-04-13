@@ -136,8 +136,8 @@ function parseTripPlanFromText(text: string): TripPlan {
     accommodation: sectionMap['NOCLEGI'],
     localCuisine: sectionMap['LOKALNA KUCHNIA'],
     practicalTips: sectionMap['PORADY PRAKTYCZNE'],
-    estimatedBudget: sectionMap['SZACOWANY BUDŻET'],
-    rawContent: text
+    estimatedBudget: sectionMap['SZACOWANY BUDŻET']
+    // rawContent: text
   };
 
   return tripPlan;
@@ -159,5 +159,5 @@ interface TripPlan {
   localCuisine: string;
   practicalTips: string;
   estimatedBudget: string;
-  rawContent: string;
+  // rawContent: string;
 }

@@ -35,7 +35,7 @@ const Hero = () => {
               width={300}
               height={400}
               className={cn(
-                "w-60 md:w-64 lg:w-80 aspect-[2/3] object-cover rounded-3xl shadow-lg",
+                "md:w-64 lg:w-80 aspect-[2/3] object-cover rounded-3xl shadow-lg",
                 "border-4 border-white dark:border-gray-800",
                 "hover:shadow-orange-200 dark:hover:shadow-orange-900/30",
               )}
@@ -73,7 +73,7 @@ const Hero = () => {
               width={250}
               height={350}
               className={cn(
-                "w-52 md:w-56 lg:w-64 aspect-[2/3] object-cover",
+                "md:w-56 lg:w-64 aspect-[2/3] object-cover",
                 "rounded-3xl shadow-lg",
                 "border-4 border-orange-500 dark:border-orange-700",
                 "hover:shadow-orange-200",

@@ -20,4 +20,17 @@ model User {
   @@index([email, apiKey])
 }
 
+model TripPlan {
+  id              String    @id @default(cuid())
+  externalId      String?   @unique
+  from            String
+  to              String
+  summary         String
+  transportation  String
+  dailyPlans      String
+  accommodation   String
+  localCuisine    String
+  practicalTips   String
+  estimatedBudget String
+}
 

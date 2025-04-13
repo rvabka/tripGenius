@@ -5,8 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import Loader from '@/components/Loader';
+import { useUser } from '@clerk/nextjs';
+import { saveTripPlan } from '../actions/actions';
+import { FilePlus, Plus, Printer } from 'lucide-react';
 
-interface TripPlan {
+export interface TripPlan {
+  externalId: string;
+  from: string;
+  to: string;
   summary: string;
   transportation: string;
   dailyPlans: string;
@@ -14,7 +20,6 @@ interface TripPlan {
   localCuisine: string;
   practicalTips: string;
   estimatedBudget: string;
-  rawContent: string;
 }
 
 export default function TripResults() {
@@ -22,26 +27,44 @@ export default function TripResults() {
   const from = searchParams.get('from') || '';
   const to = searchParams.get('to') || '';
 
+  const { user } = useUser();
+
   const [tripPlan, setTripPlan] = useState<TripPlan | null>(null);
   const [activeTab, setActiveTab] = useState('summary');
 
   useEffect(() => {
     const savedPlan = localStorage.getItem('tripPlan');
     if (savedPlan) {
-      setTripPlan(JSON.parse(savedPlan));
+      const parsedPlan = JSON.parse(savedPlan);
+      setTripPlan({
+        ...parsedPlan,
+        externalId: user?.id,
+        from: from,
+        to: to
+      });
     }
-  }, []);
+  }, [user, from, to]);
+
+  const handleClick = async () => {
+    try {
+      if (tripPlan !== null) {
+        await saveTripPlan(tripPlan);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   console.log(tripPlan);
 
   const tabs = [
-    { id: 'summary', label: 'Podsumowanie' },
-    { id: 'daily', label: 'Plan dzienny' },
+    { id: 'summary', label: 'Summary' },
+    { id: 'daily', label: 'Daily plan' },
     { id: 'transport', label: 'Transport' },
-    { id: 'accommodation', label: 'Noclegi' },
-    { id: 'cuisine', label: 'Kuchnia' },
-    { id: 'tips', label: 'Porady' },
-    { id: 'budget', label: 'Budżet' }
+    { id: 'accommodation', label: 'Accommodation' },
+    { id: 'cuisine', label: 'Kitchen' },
+    { id: 'tips', label: 'Tips' },
+    { id: 'budget', label: 'Budget' }
   ];
 
   if (!tripPlan) {
@@ -61,7 +84,7 @@ export default function TripResults() {
           </div>
         </h1>
         <p className="text-center text-gray-600 mt-3">
-          Wygenerowano przez TripGenius AI
+          Generate with <span className="font-bold">TripGenius AI</span>
         </p>
       </div>
 
@@ -146,19 +169,29 @@ export default function TripResults() {
         )}
       </div>
 
-      <div className="mt-8 flex justify-between">
+      <div className="mt-8 flex justify-center items-center gap-4">
         <Link
           href="/trip-planner"
-          className="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50"
+          className="px-4 py-2 flex items-center justify-center border-2 border-[#1d3557] text-[#1d3557] rounded-md hover:bg-[#1d3557]/10 transition-all duration-300 group"
         >
-          Stwórz nowy plan
+          <FilePlus className="mr-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+          Create another trip
         </Link>
 
         <button
-          onClick={() => window.print()}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          onClick={handleClick}
+          className="px-4 py-2 flex items-center justify-center bg-[#359572] text-white rounded-md hover:bg-[#359572]/90 transition-all duration-300 group cursor-pointer"
         >
-          Drukuj plan podróży
+          <Plus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
+          Add to my account
+        </button>
+
+        <button
+          onClick={() => window.print()}
+          className="px-4 py-2 flex items-center justify-center bg-[#ff6900] text-white rounded-md hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer"
+        >
+          <Printer className="mr-2 h-4 w-4 group-hover:translate-y-0.5 transition-transform" />
+          Print trip plan
         </button>
       </div>
     </div>
