@@ -254,11 +254,10 @@ input[type='date'].date-input--has-value::-webkit-datetime-edit-year-field {
 .prose > p:first-of-type::first-letter {
   font-size: 1.5em;
   font-weight: 600;
-  color: #4a6b4a;
+  color: #ff6900;
   float: left;
   line-height: 1;
-  margin-right: 0.2em;
-  padding-top: 0.1em;
+  margin-bottom: -0.1em;
 }
 
 .prose > p:last-of-type {

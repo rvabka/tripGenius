@@ -9,8 +9,11 @@ import { useUser } from '@clerk/nextjs';
 import { saveTripPlan } from '../actions/actions';
 import { FilePlus, Plus, Printer } from 'lucide-react';
 
+import { toast } from 'sonner';
+
 export interface TripPlan {
-  externalId: string;
+  id: string;
+  userId: string;
   from: string;
   to: string;
   summary: string;
@@ -38,7 +41,7 @@ export default function TripResults() {
       const parsedPlan = JSON.parse(savedPlan);
       setTripPlan({
         ...parsedPlan,
-        externalId: user?.id,
+        userId: user?.id,
         from: from,
         to: to
       });
@@ -49,6 +52,7 @@ export default function TripResults() {
     try {
       if (tripPlan !== null) {
         await saveTripPlan(tripPlan);
+        toast('Trip has been added to your Dashboard☺️');
       }
     } catch (error) {
       console.log(error);

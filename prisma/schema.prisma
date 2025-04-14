@@ -9,20 +9,25 @@ datasource db {
 
 model User {
   id            String    @id @default(cuid())
-  externalId    String?   @unique
+  externalId    String    @unique
   name          String?   @unique
   email         String    @unique
   apiKey        String    @unique @default(cuid())
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tripPlans     TripPlan[]
 
   @@index([email, apiKey])
 }
 
 model TripPlan {
   id              String    @id @default(cuid())
-  externalId      String?   @unique
+
+  userId          String
+  user            User?     @relation(fields: [userId], references: [externalId])
+
   from            String
   to              String
   summary         String
@@ -32,5 +37,7 @@ model TripPlan {
   localCuisine    String
   practicalTips   String
   estimatedBudget String
+
+  @@index([userId])
 }
 

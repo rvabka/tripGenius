@@ -25,12 +25,25 @@ export async function POST(request: NextRequest) {
       preferences
     );
 
-    const result = await geminiModel.generateContent(prompt);
+    const result = await geminiModel.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.2,
+        topK: 20,
+        topP: 0.8
+      }
+    });
     const text = result.response.text().trim();
 
-    const tripPlan = parseTripPlanFromText(text);
+    try {
+      const jsonResponse = JSON.parse(text);
+      return NextResponse.json({ tripPlan: jsonResponse, rawResponse: text });
+    } catch (e) {
 
-    return NextResponse.json({ tripPlan, rawResponse: text });
+      console.log(e);
+      const tripPlan = parseTripPlanFromText(text);
+      return NextResponse.json({ tripPlan, rawResponse: text });
+    }
   } catch (error) {
     console.error('Error in trip planning:', error);
     return NextResponse.json(
@@ -64,7 +77,8 @@ DANE PODRÓŻY:
 - Styl podróżowania: ${travelStyle}
 - Preferowany transport: ${transportationType}
 
-Zwróć szczegółowy plan podróży w następującym formacie:
+Zwróć szczegółowy plan podróży w następującym formacie (każda sekcja powinna być sformatowana z użyciem markdown dla lepszej czytelności):
+
 1. PODSUMOWANIE TRASY: Krótki opis trasy podróży, główne punkty i ogólne zalecenia.
 2. TRANSPORT: Najlepsze opcje transportu między lokalizacjami (samolot, pociąg, autobus, samochód) z przybliżonymi cenami i czasem podróży.
 3. PLAN DZIENNY: Szczegółowy plan dla każdego dnia podróży, zawierający miejsca do odwiedzenia, atrakcje i rekomendowane lokalne doświadczenia.
@@ -73,7 +87,20 @@ Zwróć szczegółowy plan podróży w następującym formacie:
 6. PORADY PRAKTYCZNE: Wskazówki dotyczące lokalnej kultury, transportu, bezpieczeństwa i innych praktycznych aspektów.
 7. SZACOWANY BUDŻET: Przybliżony koszt całej podróży z podziałem na główne kategorie.
 
-Stwórz szczegółowy, praktyczny plan podróży oparty na tych informacjach. Zadbaj żeby wszystkie pola zostały wypełnione i żadne nie zostało puste. Użyj języka polskiego i zachowaj formatowanie. Nie dodawaj żadnych dodatkowych informacji ani komentarzy. Możesz w niektórych miejsach dodać jakieś emotki.`;
+Każda sekcja powinna być wyraźnie oznaczona numerem i tytułem (np. "1. PODSUMOWANIE TRASY:"), a następnie zawierać szczegółowe informacje. Używaj formatowania markdown (## dla nagłówków, * dla punktów listy, ** dla wyróżnień).
+
+Stwórz szczegółowy, praktyczny plan podróży oparty na tych informacjach. Zadbaj żeby wszystkie pola zostały wypełnione i żadne nie zostało puste. Użyj języka polskiego i zachowaj formatowanie. Nie dodawaj żadnych dodatkowych informacji ani komentarzy. Możesz w niektórych miejscach dodać emotki.
+
+OPCJONALNIE: Jeśli wolisz, możesz zwrócić odpowiedź jako poprawny obiekt JSON o następującej strukturze:
+{
+  "summary": "tekst w formacie markdown",
+  "transportation": "tekst w formacie markdown",
+  "dailyPlans": "tekst w formacie markdown",
+  "accommodation": "tekst w formacie markdown",
+  "localCuisine": "tekst w formacie markdown",
+  "practicalTips": "tekst w formacie markdown",
+  "estimatedBudget": "tekst w formacie markdown"
+}`;
 }
 
 function parseTripPlanFromText(text: string): TripPlan {
@@ -94,37 +121,49 @@ function parseTripPlanFromText(text: string): TripPlan {
   });
 
   const sectionRegex = /(\d+\.\s+(.*?)(?::|$))/g;
-
   const sectionHeaders = [...text.matchAll(sectionRegex)].map(match => ({
     fullMatch: match[0],
     title: match[2].trim()
   }));
 
-  // Extract content between sections
   for (let i = 0; i < sectionHeaders.length; i++) {
     const currentHeader = sectionHeaders[i];
     const nextHeader = sectionHeaders[i + 1];
 
-    // Find the start position (after the current header)
     const startPos =
       text.indexOf(currentHeader.fullMatch) + currentHeader.fullMatch.length;
 
-    // Find the end position (before the next header or end of text)
     const endPos = nextHeader
       ? text.indexOf(nextHeader.fullMatch)
       : text.length;
 
-    // Extract the content
     if (startPos < endPos) {
       const content = text.substring(startPos, endPos).trim();
 
-      // Map the section title to our expected keys
       const matchingTitle = sectionTitles.find(title =>
         currentHeader.title.includes(title)
       );
 
       if (matchingTitle) {
         sectionMap[matchingTitle] = content;
+      }
+    }
+  }
+
+  if (Object.values(sectionMap).every(val => val === '')) {
+    const markdownSections = text.split(/##\s+/);
+
+    for (const section of markdownSections) {
+      if (!section.trim()) continue;
+
+      const firstLine = section.split('\n')[0].trim();
+      const content = section.substring(firstLine.length).trim();
+
+      for (const title of sectionTitles) {
+        if (firstLine.toUpperCase().includes(title)) {
+          sectionMap[title] = content;
+          break;
+        }
       }
     }
   }
@@ -136,8 +175,8 @@ function parseTripPlanFromText(text: string): TripPlan {
     accommodation: sectionMap['NOCLEGI'],
     localCuisine: sectionMap['LOKALNA KUCHNIA'],
     practicalTips: sectionMap['PORADY PRAKTYCZNE'],
-    estimatedBudget: sectionMap['SZACOWANY BUDŻET']
-    // rawContent: text
+    estimatedBudget: sectionMap['SZACOWANY BUDŻET'],
+    rawContent: text
   };
 
   return tripPlan;
@@ -159,5 +198,5 @@ interface TripPlan {
   localCuisine: string;
   practicalTips: string;
   estimatedBudget: string;
-  // rawContent: string;
+  rawContent: string;
 }

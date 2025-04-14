@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import Loader from '@/components/Loader';
 
@@ -23,6 +24,9 @@ const defaultPreferences: TripPreferences = {
 
 export default function TripPlanner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromParam = searchParams.get('from');
+  const destinationParam = searchParams.get('destination');
 
   const [startLocation, setStartLocation] = useState('');
   const [destination, setDestination] = useState('');
@@ -31,6 +35,16 @@ export default function TripPlanner() {
     useState<TripPreferences>(defaultPreferences);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (fromParam) {
+      setStartLocation(fromParam);
+    }
+
+    if (destinationParam) {
+      setDestination(destinationParam);
+    }
+  }, [fromParam, destinationParam]);
 
   const popularDestinations = [
     'Paris, France',

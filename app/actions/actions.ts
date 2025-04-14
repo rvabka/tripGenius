@@ -6,7 +6,7 @@ import { TripPlan } from '../trip-results/page';
 export async function saveTripPlan(tripPlan: TripPlan) {
   await prisma.tripPlan.create({
     data: {
-      externalId: tripPlan.externalId,
+      userId: tripPlan.userId,
       from: tripPlan.from,
       to: tripPlan.to,
       summary: tripPlan.summary,
@@ -18,4 +18,14 @@ export async function saveTripPlan(tripPlan: TripPlan) {
       estimatedBudget: tripPlan.estimatedBudget
     }
   });
+}
+
+export async function getTripPlans(userId: string) {
+  const trips = await prisma.tripPlan.findMany({
+    where: {
+      userId: userId
+    }
+  });
+
+  return trips;
 }

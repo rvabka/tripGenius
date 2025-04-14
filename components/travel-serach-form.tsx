@@ -7,7 +7,7 @@ import Link from 'next/link';
 export default function TravelSearchForm() {
   const [data, setData] = useState({
     from: '',
-    to: ''
+    destination: ''
   });
 
   return (
@@ -21,7 +21,8 @@ export default function TravelSearchForm() {
           />
           <div className="flex flex-col w-full">
             <label className="text-sm text-gray-400 font-medium mb-1">
-              Location
+              Location:
+              <span className="text-accentOrange"> e.g. Warsaw, Poland</span>
             </label>
             <input
               type="text"
@@ -39,12 +40,13 @@ export default function TravelSearchForm() {
           />
           <div className="flex flex-col w-full">
             <label className="text-sm text-gray-400 font-medium mb-1">
-              Location
+              Location:
+              <span className="text-accentOrange"> e.g. Paris, France</span>
             </label>
             <input
               type="text"
-              value={data.to}
-              onChange={e => setData({ ...data, to: e.target.value })}
+              value={data.destination}
+              onChange={e => setData({ ...data, destination: e.target.value })}
               className="w-full text-sm outline-none placeholder:text-gray-800 text-gray-800 font-medium"
               placeholder="Where are you going?"
             />
@@ -52,7 +54,13 @@ export default function TravelSearchForm() {
         </div>
 
         <Link
-          href={'./trip-planner'}
+          href={{
+            pathname: './trip-planner',
+            query: {
+              from: data.from,
+              destination: data.destination
+            }
+          }}
           className="flex items-center justify-center bg-accentOrange hover:bg-orange-600 transition-colors cursor-pointer text-white rounded-full p-4 w-14 h-14"
         >
           <Search size={25} />

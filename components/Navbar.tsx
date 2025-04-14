@@ -12,7 +12,7 @@ import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 const navLinks = [
   { label: 'Plan Your Trip', href: 'trip-planner', icon: '🗺️' },
-  { label: 'Saved Trips', href: 'saved', icon: '❤️' },
+  { label: 'Saved Trips', href: 'saved-trips', icon: '❤️' },
   { label: 'Explore', href: 'explore', icon: '🔍' }
 ];
 

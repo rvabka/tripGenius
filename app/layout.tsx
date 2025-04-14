@@ -6,6 +6,8 @@ import { ClerkProvider } from '@clerk/nextjs';
 import BackgroundWrapper from '@/components/background_wrapper';
 import Navbar from '@/components/Navbar';
 
+import { Toaster } from '@/components/ui/sonner';
+
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['200', '300', '400', '500', '700']
@@ -30,6 +32,7 @@ export default function RootLayout({
               <div className="max-w-[1200px] mx-auto">
                 <Navbar />
                 {children}
+                <Toaster />
               </div>
             </main>
           </BackgroundWrapper>
