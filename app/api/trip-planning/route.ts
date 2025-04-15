@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { type NextRequest, NextResponse } from 'next/server';
+export const runtime = 'edge';
 
 const googleAI = new GoogleGenerativeAI(
   process.env.NEXT_PUBLIC_GEMINI_API_KEY!
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
       }
     });
     const text = result.response.text().trim();
+    console.log("API response:", text.substring(0, 100));
 
     try {
       const jsonResponse = JSON.parse(text);
