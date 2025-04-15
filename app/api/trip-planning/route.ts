@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.2,
-        topK: 20,
-        topP: 0.8
+        topK: 10,
+        topP: 0.4
       }
     });
     const text = result.response.text().trim();
