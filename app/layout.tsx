@@ -32,18 +32,15 @@ export default function RootLayout({
           <BackgroundWrapper>
             <main>
               <div className="max-w-[1200px] mx-auto">
+                <Navbar />
                 <Suspense
                   fallback={
-                    <Loader
-                      addInformation={false}
-                      addText={'Loading applications...'}
-                    />
+                    <Loader addInformation={false} addText={'Loading app...'} />
                   }
                 >
-                  <Navbar />
                   {children}
-                  <Toaster />
                 </Suspense>
+                <Toaster />
               </div>
             </main>
           </BackgroundWrapper>
