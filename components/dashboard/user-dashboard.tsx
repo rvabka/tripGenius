@@ -159,13 +159,13 @@ export function UserDashboard() {
                 <div className="mt-4 grid grid-cols-3 gap-4">
                   <TripStats
                     title="Total Trips"
-                    value="12"
+                    value={fetchedTrips.length.toString()}
                     label="Planned"
                     icon={<MapPin className="h-4 w-4" />}
                   />
                   <TripStats
                     title="Countries"
-                    value="8"
+                    value={fetchedTrips.length.toString()}
                     label="Destinations"
                     icon={<Plane className="h-4 w-4" />}
                   />

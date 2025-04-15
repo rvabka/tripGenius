@@ -10,7 +10,7 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   externalId    String    @unique
-  name          String?   @unique
+  name          String?  
   email         String    @unique
   apiKey        String    @unique @default(cuid())
 

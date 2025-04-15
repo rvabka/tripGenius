@@ -12,8 +12,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (type === 'user.created') {
-      await prisma.user.create({
-        data: {
+      await prisma.user.upsert({
+        where: { externalId: data.id },
+        update: {
+          name: data.first_name || null,
+          email: data.email_addresses[0]?.email_address || ''
+        },
+        create: {
           externalId: data.id,
           name: data.first_name || null,
           email: data.email_addresses[0]?.email_address || ''

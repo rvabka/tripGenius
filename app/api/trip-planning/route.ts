@@ -193,8 +193,8 @@ interface TripPreferences {
 
 interface TripPlan {
   summary: string;
-  transportation: string;
   dailyPlans: string;
+  transportation: string;
   accommodation: string;
   localCuisine: string;
   practicalTips: string;

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex flex-col lg:flex-row items-center justify-between lg:-mt-14 container mx-auto px-4 md:px-6">
+    <section className="relative min-h-screen flex flex-col lg:flex-row items-center justify-between lg:-mt-14 xl:-mt-8 container mx-auto px-4 md:px-6">
       <div className="flex flex-col md:items-center lg:items-start max-w-xl text-center lg:w-1/2 lg:text-left z-10 lg:pr-8">
         <p className="text-base tracking-wider text-gray-500 mt-4 lg:mt-0">because AI plans trips intelligently 😍</p>
         <h1 className={`text-4xl md:text-5xl font-bold leading-tight my-1 ${rocknroll.className}`}>
