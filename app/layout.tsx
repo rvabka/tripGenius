@@ -2,11 +2,13 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
+import { Suspense } from 'react';
 
 import BackgroundWrapper from '@/components/background_wrapper';
 import Navbar from '@/components/Navbar';
 
 import { Toaster } from '@/components/ui/sonner';
+import Loader from '@/components/Loader';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -30,9 +32,18 @@ export default function RootLayout({
           <BackgroundWrapper>
             <main>
               <div className="max-w-[1200px] mx-auto">
-                <Navbar />
-                {children}
-                <Toaster />
+                <Suspense
+                  fallback={
+                    <Loader
+                      addInformation={false}
+                      addText={'Loading applications...'}
+                    />
+                  }
+                >
+                  <Navbar />
+                  {children}
+                  <Toaster />
+                </Suspense>
               </div>
             </main>
           </BackgroundWrapper>

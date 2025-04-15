@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Progress } from './ui/progress';
 
 const Loader = ({ addInformation, addText }: { addInformation: boolean, addText?: string }) => {
-  
+
   const [progress, setProgress] = useState<number>(0);
 
   const statusUpdates = [
