@@ -5,7 +5,7 @@ export const runtime = 'edge';
 const googleAI = new GoogleGenerativeAI(
   process.env.NEXT_PUBLIC_GEMINI_API_KEY!
 );
-const MODEL_NAME = 'gemini-2.5-pro-exp-03-25';
+const MODEL_NAME = 'gemini-2.0-flash-thinking-exp-01-21';
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,13 +35,12 @@ export async function POST(request: NextRequest) {
       }
     });
     const text = result.response.text().trim();
-    console.log("API response:", text.substring(0, 100));
+    console.log('API response:', text.substring(0, 100));
 
     try {
       const jsonResponse = JSON.parse(text);
       return NextResponse.json({ tripPlan: jsonResponse, rawResponse: text });
     } catch (e) {
-
       console.log(e);
       const tripPlan = parseTripPlanFromText(text);
       return NextResponse.json({ tripPlan, rawResponse: text });
