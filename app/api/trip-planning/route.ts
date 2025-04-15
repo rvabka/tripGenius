@@ -6,6 +6,7 @@ const googleAI = new GoogleGenerativeAI(
   process.env.NEXT_PUBLIC_GEMINI_API_KEY!
 );
 const MODEL_NAME = 'gemini-2.0-flash-thinking-exp-01-21';
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY!;
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,20 +38,66 @@ export async function POST(request: NextRequest) {
     const text = result.response.text().trim();
     console.log('API response:', text.substring(0, 100));
 
+    let tripPlan;
     try {
-      const jsonResponse = JSON.parse(text);
-      return NextResponse.json({ tripPlan: jsonResponse, rawResponse: text });
+      tripPlan = JSON.parse(text);
     } catch (e) {
-      console.log(e);
-      const tripPlan = parseTripPlanFromText(text);
-      return NextResponse.json({ tripPlan, rawResponse: text });
+      console.log('Error parsing JSON response:', e);
+      tripPlan = parseTripPlanFromText(text);
     }
+
+    let imageUrl = '';
+    try {
+      imageUrl = await fetchDestinationImage(destination);
+      console.log('Fetched image URL:', imageUrl);
+    } catch (e) {
+      console.log('Error fetching image:', e);
+    }
+
+    tripPlan.image = imageUrl;
+    tripPlan.duration = preferences.duration;
+    tripPlan.transportType = preferences.transportationType;
+
+    return NextResponse.json({
+      tripPlan,
+      rawResponse: text
+    });
   } catch (error) {
     console.error('Error in trip planning:', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
     );
+  }
+}
+
+async function fetchDestinationImage(destination: string): Promise<string> {
+  try {
+    const response = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(
+        destination + ' travel'
+      )}&per_page=1&orientation=landscape`,
+      {
+        headers: {
+          Authorization: PEXELS_API_KEY
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Pexels API responded with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.photos && data.photos.length > 0) {
+      return data.photos[0].src.large;
+    }
+
+    return '';
+  } catch (error) {
+    console.error('Error fetching image from Pexels:', error);
+    return '';
   }
 }
 
@@ -177,6 +224,9 @@ function parseTripPlanFromText(text: string): TripPlan {
     localCuisine: sectionMap['LOKALNA KUCHNIA'],
     practicalTips: sectionMap['PORADY PRAKTYCZNE'],
     estimatedBudget: sectionMap['SZACOWANY BUDŻET'],
+    image: '',
+    duration: '',
+    transportType: '',
     rawContent: text
   };
 
@@ -199,5 +249,8 @@ interface TripPlan {
   localCuisine: string;
   practicalTips: string;
   estimatedBudget: string;
+  image: string;
+  duration: string;
+  transportType: string;
   rawContent: string;
 }

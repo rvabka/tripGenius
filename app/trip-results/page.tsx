@@ -3,12 +3,23 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import Loader from '@/components/Loader';
 import { useUser } from '@clerk/nextjs';
 import { saveTripPlan } from '../actions/actions';
-import { FilePlus, Plus, Printer } from 'lucide-react';
-
+import {
+  FilePlus,
+  Plus,
+  Printer,
+  MapPin,
+  Calendar,
+  Plane,
+  Car,
+  Train,
+  Bus,
+  Leaf
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface TripPlan {
@@ -23,6 +34,9 @@ export interface TripPlan {
   localCuisine: string;
   practicalTips: string;
   estimatedBudget: string;
+  image: string;
+  duration: string;
+  transportType: string;
 }
 
 export default function TripResults() {
@@ -39,11 +53,15 @@ export default function TripResults() {
     const savedPlan = localStorage.getItem('tripPlan');
     if (savedPlan) {
       const parsedPlan = JSON.parse(savedPlan);
+      console.log(parsedPlan.image);
       setTripPlan({
         ...parsedPlan,
         userId: user?.id,
         from: from,
-        to: to
+        to: to,
+        image: parsedPlan.image || '',
+        duration: parsedPlan.duration || '',
+        transportType: parsedPlan.transportType || ''
       });
     }
   }, [user, from, to]);
@@ -59,16 +77,32 @@ export default function TripResults() {
     }
   };
 
-  console.log(tripPlan);
+  const getTransportIcon = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case 'plane':
+        return <Plane className="h-5 w-5" />;
+      case 'car':
+        return <Car className="h-5 w-5" />;
+      case 'train':
+        return <Train className="h-5 w-5" />;
+      case 'public transport':
+        return <Bus className="h-5 w-5" />;
+      case 'ecological':
+        return <Leaf className="h-5 w-5" />;
+      case 'any':
+      default:
+        return <Plane className="h-5 w-5" />;
+    }
+  };
 
   const tabs = [
-    { id: 'summary', label: 'Summary' },
-    { id: 'daily', label: 'Daily plan' },
+    { id: 'summary', label: 'Podsumowanie' },
     { id: 'transport', label: 'Transport' },
-    { id: 'accommodation', label: 'Accommodation' },
-    { id: 'cuisine', label: 'Kitchen' },
-    { id: 'tips', label: 'Tips' },
-    { id: 'budget', label: 'Budget' }
+    { id: 'daily', label: 'Plan dzienny' },
+    { id: 'accommodation', label: 'Noclegi' },
+    { id: 'cuisine', label: 'Kuchnia' },
+    { id: 'tips', label: 'Porady' },
+    { id: 'budget', label: 'Budżet' }
   ];
 
   if (!tripPlan) {
@@ -78,123 +112,164 @@ export default function TripResults() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="flex flex-col text-3xl font-bold text-center gap-2">
-          Twój plan podróży:
-          <div>
-            <span className="font-light text-accentOrange">{from}</span> →{' '}
-            <span className="font-light text-accentOrange">{to}</span>
+    <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-8">
+      {/* Hero section with image */}
+      <div className="relative rounded-xl overflow-hidden h-[300px] md:h-[400px] shadow-xl">
+        {tripPlan.image ? (
+          <Image
+            src={tripPlan.image || '/placeholder.svg'}
+            alt={`${from} to ${to} trip`}
+            fill
+            className="object-cover"
+            priority
+          />
+        ) : (
+          <Image
+            src="/placeholder.svg?height=400&width=1200"
+            alt="Trip placeholder"
+            fill
+            className="object-cover"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6 text-white">
+          <div className="flex items-center gap-2 mb-2">
+            <MapPin className="h-5 w-5 text-white/80" />
+            <div className="flex items-center text-xl md:text-2xl">
+              <span className="font-medium text-white/90">{from}</span>
+              <span className="mx-2">→</span>
+              <span className="font-medium text-white/90">{to}</span>
+            </div>
           </div>
-        </h1>
-        <p className="text-center text-gray-600 mt-3">
-          Generate with <span className="font-bold">TripGenius AI</span>
-        </p>
+
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            Twój plan podróży
+          </h1>
+
+          <div className="flex flex-wrap gap-3 mt-2">
+            {tripPlan.duration && (
+              <div className="bg-white/10 text-white border border-white/20 backdrop-blur-sm px-3 py-1 rounded-full flex items-center text-sm">
+                <Calendar className="h-4 w-4 mr-1" />
+                {tripPlan.duration}
+              </div>
+            )}
+            {tripPlan.transportType && (
+              <div className="bg-white/10 text-white border border-white/20 backdrop-blur-sm px-3 py-1 rounded-full flex items-center text-sm">
+                {getTransportIcon(tripPlan.transportType)}
+                <span className="ml-1">{tripPlan.transportType}</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-center items-center border-b mb-6">
-        <div className="flex overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="flex md:justify-center md:items-center overflow-x-auto border-b py-2 gap-0 md:gap-2">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 font-medium text-sm whitespace-nowrap ${
+              className={`px-6 py-3 font-medium text-sm whitespace-nowrap transition-colors cursor-pointer rounded-xl ${
                 activeTab === tab.id
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-customGreen text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               {tab.label}
             </button>
           ))}
         </div>
+
+        <div className="p-6">
+          {activeTab === 'summary' && (
+            <div className="prose prose-slate max-w-none mx-auto text-center">
+              <h2 className="text-2xl font-semibold mb-4">
+                Podsumowanie trasy
+              </h2>
+              <div className="text-center mx-auto max-w-3xl">
+                <ReactMarkdown>{tripPlan.summary}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'daily' && (
+            <div className="prose prose-slate max-w-none mx-auto text-center">
+              <h2 className="text-2xl font-semibold mb-4">Plan dzienny</h2>
+              <div className="text-left mx-auto max-w-3xl ">
+                <ReactMarkdown>{tripPlan.dailyPlans}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'transport' && (
+            <div className="prose prose-slate max-w-none mx-auto text-center">
+              <h2 className="text-2xl font-semibold mb-4">Transport</h2>
+              <div className="text-left mx-auto max-w-3xl">
+                <ReactMarkdown>{tripPlan.transportation}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'accommodation' && (
+            <div className="prose prose-slate max-w-none mx-auto text-center">
+              <h2 className="text-2xl font-semibold mb-4">Noclegi</h2>
+              <div className="text-left mx-auto max-w-3xl">
+                <ReactMarkdown>{tripPlan.accommodation}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'cuisine' && (
+            <div className="prose prose-slate max-w-none mx-auto text-center">
+              <h2 className="text-2xl font-semibold mb-4">Lokalna kuchnia</h2>
+              <div className="text-left mx-auto max-w-3xl">
+                <ReactMarkdown>{tripPlan.localCuisine}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'tips' && (
+            <div className="prose prose-slate max-w-none mx-auto text-center">
+              <h2 className="text-2xl font-semibold mb-4">Porady praktyczne</h2>
+              <div className="text-left mx-auto max-w-3xl">
+                <ReactMarkdown>{tripPlan.practicalTips}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'budget' && (
+            <div className="prose prose-slate max-w-none mx-auto text-center">
+              <h2 className="text-2xl font-semibold mb-4">Szacowany budżet</h2>
+              <div className="text-left mx-auto max-w-3xl">
+                <ReactMarkdown>{tripPlan.estimatedBudget}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="flex justify-center items-center bg-white rounded-lg shadow-md p-6">
-        {activeTab === 'summary' && (
-          <div className="prose">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              Podsumowanie trasy
-            </h2>
-            <ReactMarkdown>{tripPlan.summary}</ReactMarkdown>
-          </div>
-        )}
-
-        {activeTab === 'daily' && (
-          <div className="prose">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              Plan dzienny
-            </h2>
-            <ReactMarkdown>{tripPlan.dailyPlans}</ReactMarkdown>
-          </div>
-        )}
-
-        {activeTab === 'transport' && (
-          <div className="prose">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              Transport
-            </h2>
-            <ReactMarkdown>{tripPlan.transportation}</ReactMarkdown>
-          </div>
-        )}
-
-        {activeTab === 'accommodation' && (
-          <div className="prose">
-            <h2 className="text-2xl font-semibold mb-4 text-center">Noclegi</h2>
-            <ReactMarkdown>{tripPlan.accommodation}</ReactMarkdown>
-          </div>
-        )}
-
-        {activeTab === 'cuisine' && (
-          <div className="prose">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              Lokalna kuchnia
-            </h2>
-            <ReactMarkdown>{tripPlan.localCuisine}</ReactMarkdown>
-          </div>
-        )}
-
-        {activeTab === 'tips' && (
-          <div className="prose">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              Porady praktyczne
-            </h2>
-            <ReactMarkdown>{tripPlan.practicalTips}</ReactMarkdown>
-          </div>
-        )}
-
-        {activeTab === 'budget' && (
-          <div className="prose">
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              Szacowany budżet
-            </h2>
-            <ReactMarkdown>{tripPlan.estimatedBudget}</ReactMarkdown>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-8 flex justify-center items-center gap-4">
+      {/* Action buttons */}
+      <div className="flex flex-wrap justify-center items-center gap-4">
         <Link
           href="/trip-planner"
-          className="px-4 py-2 flex items-center justify-center border-2 border-[#1d3557] text-[#1d3557] rounded-md hover:bg-[#1d3557]/10 transition-all duration-300 group"
+          className="px-5 py-2.5 flex items-center justify-center border-2 border-[#1d3557] text-[#1d3557] rounded-lg hover:bg-[#1d3557]/10 transition-all duration-300 group font-medium"
         >
-          <FilePlus className="mr-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+          <FilePlus className="mr-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
           Create another trip
         </Link>
 
         <button
           onClick={handleClick}
-          className="px-4 py-2 flex items-center justify-center bg-[#359572] text-white rounded-md hover:bg-[#359572]/90 transition-all duration-300 group cursor-pointer"
+          className="px-5 py-2.5 flex items-center justify-center bg-[#359572] text-white rounded-lg hover:bg-[#359572]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md"
         >
-          <Plus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
+          <Plus className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
           Add to my account
         </button>
 
         <button
           onClick={() => window.print()}
-          className="px-4 py-2 flex items-center justify-center bg-[#ff6900] text-white rounded-md hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer"
+          className="px-5 py-2.5 flex items-center justify-center bg-[#ff6900] text-white rounded-lg hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md"
         >
-          <Printer className="mr-2 h-4 w-4 group-hover:translate-y-0.5 transition-transform" />
+          <Printer className="mr-2 h-5 w-5 group-hover:translate-y-0.5 transition-transform" />
           Print trip plan
         </button>
       </div>

@@ -98,7 +98,7 @@ export default function TripPlanner() {
         body: JSON.stringify({
           startLocation,
           destination,
-          preferences
+          preferences,
         })
       });
 

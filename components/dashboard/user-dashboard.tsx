@@ -1,111 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  MapPin,
-  Plane,
-  Plus,
-  ChevronRight,
-  Map,
-  Compass,
-  Briefcase
-} from 'lucide-react';
+import { MapPin, Plane, Plus, Map, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TripCard } from '@/components/dashboard/trip-card';
 import { TripStats } from '@/components/dashboard/trip-stats';
-import { TripProgress } from '@/components/dashboard/trip-progress';
 import { TripChart } from '@/components/dashboard/trip-chart';
-import { ColorPicker } from '@/components/dashboard/color-picker';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import { getTripPlans } from '@/app/actions/actions';
 import { useUser } from '@clerk/nextjs';
 import { TripPlan } from '@/app/trip-results/page';
 
-const sampleTrips = [
-  {
-    id: 1,
-    title: 'Barcelona Adventure',
-    fromCountry: 'Poland',
-    toCountry: 'Spain',
-    duration: '7 days',
-    image: '/placeholder.svg?height=200&width=300',
-    color: '#359572', // customGreen
-    progress: 85
-  },
-  {
-    id: 2,
-    title: 'Tokyo Exploration',
-    fromCountry: 'Poland',
-    toCountry: 'Japan',
-    duration: '10 days',
-    image: '/placeholder.svg?height=200&width=300',
-    color: '#ff6900', // accentOrange
-    progress: 60
-  },
-  {
-    id: 3,
-    title: 'New York City Trip',
-    fromCountry: 'Poland',
-    toCountry: 'USA',
-    duration: '7 days',
-    image: '/placeholder.svg?height=200&width=300',
-    color: '#1d3557', // accentColor
-    progress: 30
-  }
-];
-
-const progressCards = [
-  {
-    id: 1,
-    title: 'Europe Tour',
-    icon: <Plane className="h-5 w-5 text-white" />,
-    fromCountry: 'Poland',
-    toCountry: 'Italy',
-    metric: '14 days',
-    progress: 45,
-    status: 'Planning',
-    color: '#359572' // customGreen
-  },
-  {
-    id: 2,
-    title: 'Beach Getaway',
-    icon: <Compass className="h-5 w-5 text-white" />,
-    fromCountry: 'Poland',
-    toCountry: 'Greece',
-    metric: '7 days',
-    progress: 75,
-    status: 'Almost Ready',
-    color: '#ff6900' // accentOrange
-  },
-  {
-    id: 3,
-    title: 'Business Trip',
-    icon: <Briefcase className="h-5 w-5 text-white" />,
-    fromCountry: 'Poland',
-    toCountry: 'Germany',
-    metric: '5 days',
-    progress: 90,
-    status: 'Ready',
-    color: '#1d3557' // accentColor
-  }
-];
 
 export function UserDashboard() {
   const { user } = useUser();
 
-  const [trips, setTrips] = useState(sampleTrips);
   const [fetchedTrips, setFetchedTrips] = useState<TripPlan[]>([]);
-
-  const [selectedTrip, setSelectedTrip] = useState<number | null>(null);
-  const [colorPickerOpen, setColorPickerOpen] = useState(false);
-
-  const handleColorChange = (tripId: number, color: string) => {
-    setTrips(
-      trips.map(trip => (trip.id === tripId ? { ...trip, color } : trip))
-    );
-    setColorPickerOpen(false);
-  };
 
   useEffect(() => {
     async function fetchTrips() {
@@ -180,23 +91,8 @@ export function UserDashboard() {
 
               {/* Trip Cards */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {trips.slice(0, 2).map(trip => (
-                  <TripCard
-                    key={trip.id}
-                    trip={trip}
-                    variant="dashboard"
-                    onColorClick={() => {
-                      setSelectedTrip(trip.id);
-                      setColorPickerOpen(true);
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Progress Cards */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {progressCards.map(card => (
-                  <TripProgress key={card.id} card={card} />
+                {fetchedTrips.slice(0, 2).map(trip => (
+                  <TripCard key={trip.id} trip={trip} />
                 ))}
               </div>
             </div>
@@ -223,7 +119,7 @@ export function UserDashboard() {
                     <TabsTrigger value="details">Completed</TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="activities" className="space-y-4">
+                  {/* <TabsContent value="activities" className="space-y-4">
                     {trips.map(trip => (
                       <div
                         key={trip.id}
@@ -252,7 +148,7 @@ export function UserDashboard() {
                         </Button>
                       </div>
                     ))}
-                  </TabsContent>
+                  </TabsContent> */}
 
                   <TabsContent value="details">
                     <div className="rounded-lg bg-gray-50 p-4 text-center">
@@ -289,18 +185,6 @@ export function UserDashboard() {
           </div>
         </div>
       </div>
-
-      {colorPickerOpen && selectedTrip && (
-        <ColorPicker
-          isOpen={colorPickerOpen}
-          onClose={() => setColorPickerOpen(false)}
-          onColorSelect={color => handleColorChange(selectedTrip, color)}
-          currentColor={
-            trips.find(t => t.id === selectedTrip)?.color || '#359572'
-          }
-          presetColors={['#2c3e2e', '#4a6b4a', '#1d3557', '#359572', '#ff6900']}
-        />
-      )}
     </div>
   );
 }

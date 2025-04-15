@@ -10,7 +10,7 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   externalId    String    @unique
-  name          String?  
+  name          String?
   email         String    @unique
   apiKey        String    @unique @default(cuid())
 
@@ -28,6 +28,9 @@ model TripPlan {
   userId          String
   user            User?     @relation(fields: [userId], references: [externalId])
 
+  image           String
+  duration        String
+  transportType   String
   from            String
   to              String
   summary         String
