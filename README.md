@@ -1,4 +1,5 @@
 # 🌍 TripGenius
+https://trip-genius-9tp9.vercel.app/
 
 Plan your next adventure with the power of AI. **TripGenius** is a modern travel planning app that helps you design, organize, and manage your trips — from inspiration to itinerary — with just a few clicks.
 
