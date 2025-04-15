@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.2,
-        topK: 10,
+        topK: 5,
         topP: 0.4
       }
     });

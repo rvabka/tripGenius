@@ -67,7 +67,7 @@ const Loader = ({
 
       {addInformation && (
         <>
-          <Progress value={progress} className="w-1/2 mt-3 mb-1" />
+          <Progress value={progress} className="max-w-[400px] mt-3 mb-1" />
 
           <p className="text-2xl font-light text-white text-center">
             {currentStatus.current}{' '}
