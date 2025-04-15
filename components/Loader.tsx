@@ -3,8 +3,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Progress } from './ui/progress';
 
-const Loader = ({ addInformation, addText }: { addInformation: boolean, addText?: string }) => {
-
+const Loader = ({
+  addInformation,
+  addText
+}: {
+  addInformation: boolean;
+  addText?: string;
+}) => {
   const [progress, setProgress] = useState<number>(0);
 
   const statusUpdates = [
@@ -27,23 +32,23 @@ const Loader = ({ addInformation, addText }: { addInformation: boolean, addText?
         }
         if (prev <= 50) {
           currentStatus.current = statusUpdates[1];
-          return prev + 2;
+          return prev + 2.5;
         }
         if (prev <= 60) {
           currentStatus.current = statusUpdates[2];
-          return prev + 1.25;
+          return prev + 1.75;
         }
         if (prev <= 75) {
           currentStatus.current = statusUpdates[3];
-          return prev + 1;
+          return prev + 1.5;
         }
         if (prev <= 90) {
           currentStatus.current = statusUpdates[4];
-          return prev + 1;
+          return prev + 1.25;
         }
         if (prev <= 100) {
           currentStatus.current = statusUpdates[5];
-          return prev + 0.5;
+          return prev + 1;
         }
         return prev;
       });
