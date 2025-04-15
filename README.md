@@ -93,6 +93,3 @@ Coming soon...
 
 ## 💡 Inspiration
 We believe travel planning should be easy, fun, and inspiring. TripGenius was built to bring creativity and intelligence into one place, so you can focus on enjoying the journey.
-
-## 📬 Contact
-Got questions or feedback? Reach out via GitHub Issues or drop a DM on Twitter @yourhandle.
