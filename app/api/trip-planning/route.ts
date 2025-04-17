@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
           temperature: 0.2,
           topK: 1,
           topP: 0.1,
-          maxOutputTokens: 1024
         }
       }),
       fetchDestinationImage(destination)
