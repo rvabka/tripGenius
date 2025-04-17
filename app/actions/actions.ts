@@ -4,6 +4,18 @@ import { prisma } from '../lib/prisma';
 import { TripPlan } from '../trip-results/page';
 
 export async function saveTripPlan(tripPlan: TripPlan) {
+  const existingTrip = await prisma.tripPlan.findFirst({
+    where: {
+      id: tripPlan.id,
+      image: tripPlan.image,
+      userId: tripPlan.userId
+    }
+  });
+
+  if (existingTrip) {
+    throw new Error('Trip plan already exists!');
+  }
+
   await prisma.tripPlan.create({
     data: {
       userId: tripPlan.userId,
@@ -31,4 +43,15 @@ export async function getTripPlans(userId: string) {
   });
 
   return trips;
+}
+
+export async function markAsCompleted(tripId: string) {
+  await prisma.tripPlan.update({
+    where: {
+      id: tripId
+    },
+    data: {
+      isCompleted: true
+    }
+  });
 }

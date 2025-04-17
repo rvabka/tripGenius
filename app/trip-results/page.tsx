@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import Loader from '@/components/Loader';
@@ -21,6 +20,7 @@ import {
   Leaf
 } from 'lucide-react';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 export interface TripPlan {
   id: string;
@@ -37,6 +37,7 @@ export interface TripPlan {
   image: string;
   duration: string;
   transportType: string;
+  isCompleted: boolean;
 }
 
 export default function TripResults() {
@@ -48,6 +49,8 @@ export default function TripResults() {
 
   const [tripPlan, setTripPlan] = useState<TripPlan | null>(null);
   const [activeTab, setActiveTab] = useState('summary');
+  const [isAdded, setIsAdded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const savedPlan = localStorage.getItem('tripPlan');
@@ -67,13 +70,21 @@ export default function TripResults() {
   }, [user, from, to]);
 
   const handleClick = async () => {
+    if (isSaving || isAdded) return;
+
+    setIsSaving(true);
     try {
       if (tripPlan !== null) {
         await saveTripPlan(tripPlan);
+        setIsAdded(true);
         toast('Trip has been added to your Dashboard☺️');
       }
     } catch (error) {
       console.log(error);
+      setIsAdded(true);
+      toast('Trip is already in your Dashboard!🛑');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -256,15 +267,6 @@ export default function TripResults() {
           <FilePlus className="mr-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
           Create another trip
         </Link>
-
-        <button
-          onClick={handleClick}
-          className="px-5 py-2.5 flex items-center justify-center bg-[#359572] text-white rounded-lg hover:bg-[#359572]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md"
-        >
-          <Plus className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-          Add to my account
-        </button>
-
         <button
           onClick={() => window.print()}
           className="px-5 py-2.5 flex items-center justify-center bg-[#ff6900] text-white rounded-lg hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md"
@@ -272,6 +274,27 @@ export default function TripResults() {
           <Printer className="mr-2 h-5 w-5 group-hover:translate-y-0.5 transition-transform" />
           Print trip plan
         </button>
+
+        {user?.id ? (
+          <button
+            onClick={handleClick}
+            disabled={isSaving || isAdded}
+            className={`px-5 py-2.5 flex items-center justify-center ${
+              isAdded ? 'bg-gray-400 cursor-not-allowed' : 'bg-customGreen'
+            } text-white rounded-lg transition-all duration-300 font-medium shadow-md cursor-pointer`}
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            {isAdded
+              ? 'Trip already saved'
+              : isSaving
+              ? 'Saving...'
+              : 'Save trip'}
+          </button>
+        ) : (
+          <button className="px-5 py-2.5 flex items-center justify-center bg-[#ff6900] text-white rounded-lg hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md">
+            <Link href="/sign-in">Log in to add trip to your account</Link>{' '}
+          </button>
+        )}
       </div>
     </div>
   );

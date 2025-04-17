@@ -11,7 +11,12 @@ import Link from 'next/link';
 import { getTripPlans } from '@/app/actions/actions';
 import { useUser } from '@clerk/nextjs';
 import { TripPlan } from '@/app/trip-results/page';
-
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem
+} from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 
 export function UserDashboard() {
   const { user } = useUser();
@@ -32,6 +37,10 @@ export function UserDashboard() {
 
     fetchTrips();
   }, [user]);
+
+  const calculateCompletedTrips = (): string => {
+    return fetchedTrips.filter(trip => trip.isCompleted).length.toString();
+  };
 
   console.log(fetchedTrips);
 
@@ -82,7 +91,7 @@ export function UserDashboard() {
                   />
                   <TripStats
                     title="Completed"
-                    value="5"
+                    value={calculateCompletedTrips()}
                     label="Trips"
                     icon={<Compass className="h-4 w-4" />}
                   />
@@ -90,11 +99,28 @@ export function UserDashboard() {
               </div>
 
               {/* Trip Cards */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {fetchedTrips.slice(0, 2).map(trip => (
-                  <TripCard key={trip.id} trip={trip} />
-                ))}
-              </div>
+              <Carousel
+                plugins={[
+                  Autoplay({
+                    delay: 5000
+                  })
+                ]}
+                opts={{
+                  align: 'start',
+                  loop: true
+                }}
+              >
+                <CarouselContent>
+                  {fetchedTrips.map(trip => (
+                    <CarouselItem
+                      key={trip.id}
+                      className="basis-full md:basis-1/2 shrink-0"
+                    >
+                      <TripCard key={trip.id} trip={trip} />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             </div>
 
             {/* Right Column - Upcoming Trips */}

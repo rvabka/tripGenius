@@ -28,6 +28,7 @@ model TripPlan {
   userId          String
   user            User?     @relation(fields: [userId], references: [externalId])
 
+  isCompleted     Boolean   @default(false)
   image           String
   duration        String
   transportType   String

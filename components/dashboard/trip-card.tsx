@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import Image from 'next/image';
 import { MapPin, Clock, MoreVertical, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,11 +11,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import {} from '@/components/ui/carousel';
 import { TripPlan } from '@/app/trip-results/page';
+import { markAsCompleted } from '@/app/actions/actions';
+import { toast } from 'sonner';
 
 export function TripCard({ trip }: { trip: TripPlan }) {
+  const [isCompleted, setIsCompleted] = useState(trip.isCompleted || false);
+
+  const handleClick = async () => {
+    try {
+      if (trip !== null) {
+        await markAsCompleted(trip.id);
+        setIsCompleted(true);
+        toast('Trip marked as completed!👍');
+      }
+    } catch (error) {
+      console.error('Error marking trip as completed:', error);
+    }
+  };
+
   return (
-    <div className="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg">
+    <div className="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg select-none">
       <div className="relative h-40 w-full overflow-hidden">
         <Image
           src={trip.image || '/placeholder.svg'}
@@ -67,7 +85,7 @@ export function TripCard({ trip }: { trip: TripPlan }) {
             <span className="font-medium">{trip.duration}</span>
           </div>
         </div>
-        <div className="flex justify-between gap-2">
+        <div className="flex flex-col justify-between gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -76,10 +94,12 @@ export function TripCard({ trip }: { trip: TripPlan }) {
             Add to Calendar
           </Button>
           <Button
+            disabled={isCompleted}
+            onClick={handleClick}
             size="sm"
-            className="bg-[#359572] hover:bg-[#2c7a5e] cursor-pointer"
+            className="bg-[#359572] hover:bg-[#2c7a5e] disabled:cursor-not-allowed disabled:bg-gray-400"
           >
-            Mark as Complete!
+            {isCompleted ? 'Completed' : 'Mark as Completed'}
           </Button>
         </div>
       </div>

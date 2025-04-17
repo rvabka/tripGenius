@@ -4,7 +4,6 @@ import { TripPlan } from '@/app/trip-results/page';
 import { useState, useEffect } from 'react';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 
-
 export function TripChart({ tripData }: { tripData: TripPlan[] }) {
   const [data, setData] = useState<Array<{ country: string; trips: number }>>(
     []
@@ -43,9 +42,10 @@ export function TripChart({ tripData }: { tripData: TripPlan[] }) {
           <XAxis
             dataKey="country"
             stroke="#ffffff40"
-            fontSize={12}
-            tickLine={false}
-            axisLine={false}
+            fontSize={15}
+            tickLine={true}
+            axisLine={true}
+            padding={{ left: 20, right: 20 }}
           />
           <Tooltip
             content={({ active, payload }) => {
