@@ -30,9 +30,9 @@ export async function POST(request: NextRequest) {
     const result = await geminiModel.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
-        temperature: 0.2,
+        temperature: 0.1,
         topK: 5,
-        topP: 0.4
+        topP: 0.2
       }
     });
     const text = result.response.text().trim();
