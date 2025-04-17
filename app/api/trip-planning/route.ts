@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         generationConfig: {
           temperature: 0.2,
           topK: 1,
-          topP: 0.1,
+          topP: 0.1
         }
       }),
       fetchDestinationImage(destination)
@@ -124,6 +124,8 @@ DANE PODRÓŻY:
 
 Zwróć szczegółowy plan podróży w następującym formacie (każda sekcja powinna być sformatowana z użyciem markdown dla lepszej czytelności):
 
+Nie dodawaj żadnych dodatkowych informacji ani komentarzy. Możesz w niektórych miejscach dodać emotki.
+
 1. PODSUMOWANIE TRASY: Krótki opis trasy podróży, główne punkty i ogólne zalecenia.
 2. TRANSPORT: Najlepsze opcje transportu między lokalizacjami (samolot, pociąg, autobus, samochód) z przybliżonymi cenami i czasem podróży.
 3. PLAN DZIENNY: Szczegółowy plan dla każdego dnia podróży, zawierający miejsca do odwiedzenia, atrakcje i rekomendowane lokalne doświadczenia.
@@ -133,8 +135,6 @@ Zwróć szczegółowy plan podróży w następującym formacie (każda sekcja po
 7. SZACOWANY BUDŻET: Przybliżony koszt całej podróży z podziałem na główne kategorie.
 
 Każda sekcja powinna być wyraźnie oznaczona numerem i tytułem (np. "1. PODSUMOWANIE TRASY:"), a następnie zawierać szczegółowe informacje. Używaj formatowania markdown (## dla nagłówków, * dla punktów listy, ** dla wyróżnień).
-
-Stwórz szczegółowy, praktyczny plan podróży oparty na tych informacjach. Zadbaj żeby wszystkie pola zostały wypełnione i żadne nie zostało puste. Użyj języka polskiego i zachowaj formatowanie. Nie dodawaj żadnych dodatkowych informacji ani komentarzy. Możesz w niektórych miejscach dodać emotki.
 
 OPCJONALNIE: Jeśli wolisz, możesz zwrócić odpowiedź jako poprawny obiekt JSON o następującej strukturze:
 {
