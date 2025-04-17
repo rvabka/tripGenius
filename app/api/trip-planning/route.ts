@@ -31,9 +31,10 @@ export async function POST(request: NextRequest) {
       geminiModel.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.05,
+          temperature: 0.2,
           topK: 1,
           topP: 0.1,
+          maxOutputTokens: 1024
         }
       }),
       fetchDestinationImage(destination)
@@ -43,10 +44,13 @@ export async function POST(request: NextRequest) {
     console.log('API response:', text.substring(0, 100));
 
     let tripPlan;
-    try {
-      tripPlan = JSON.parse(text);
-    } catch (e) {
-      console.log('Error parsing JSON response:', e);
+    if (text.startsWith('{')) {
+      try {
+        tripPlan = JSON.parse(text);
+      } catch {
+        tripPlan = parseTripPlanFromText(text);
+      }
+    } else {
       tripPlan = parseTripPlanFromText(text);
     }
 
@@ -69,33 +73,28 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
 async function fetchDestinationImage(destination: string): Promise<string> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 4000);
+
   try {
     const response = await fetch(
       `https://api.pexels.com/v1/search?query=${encodeURIComponent(
         destination + ' travel'
       )}&per_page=1&orientation=landscape`,
       {
-        headers: {
-          Authorization: PEXELS_API_KEY
-        }
+        headers: { Authorization: PEXELS_API_KEY },
+        signal: controller.signal
       }
     );
 
-    if (!response.ok) {
+    clearTimeout(timeout);
+    if (!response.ok)
       throw new Error(`Pexels API responded with status: ${response.status}`);
-    }
-
     const data = await response.json();
-
-    if (data.photos && data.photos.length > 0) {
-      return data.photos[0].src.large;
-    }
-
-    return '';
+    return data.photos?.[0]?.src?.large ?? '';
   } catch (error) {
-    console.error('Error fetching image from Pexels:', error);
+    console.error('Pexels error:', error);
     return '';
   }
 }
