@@ -27,15 +27,19 @@ export async function POST(request: NextRequest) {
       preferences
     );
 
-    const result = await geminiModel.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.1,
-        topK: 5,
-        topP: 0.2
-      }
-    });
-    const text = result.response.text().trim();
+    const [resultResponse, imageUrlResponse] = await Promise.all([
+      geminiModel.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.05,
+          topK: 1,
+          topP: 0.1,
+        }
+      }),
+      fetchDestinationImage(destination)
+    ]);
+
+    const text = resultResponse.response.text().trim();
     console.log('API response:', text.substring(0, 100));
 
     let tripPlan;
@@ -46,13 +50,8 @@ export async function POST(request: NextRequest) {
       tripPlan = parseTripPlanFromText(text);
     }
 
-    let imageUrl = '';
-    try {
-      imageUrl = await fetchDestinationImage(destination);
-      console.log('Fetched image URL:', imageUrl);
-    } catch (e) {
-      console.log('Error fetching image:', e);
-    }
+    const imageUrl = imageUrlResponse;
+    console.log('Fetched image URL:', imageUrl);
 
     tripPlan.image = imageUrl;
     tripPlan.duration = preferences.duration;
