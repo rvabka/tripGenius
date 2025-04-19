@@ -38,6 +38,9 @@ export interface TripPlan {
   duration: string;
   transportType: string;
   isCompleted: boolean;
+  title: string;
+  longitude: number;
+  latitude: number;
 }
 
 export default function TripResults() {
@@ -64,10 +67,15 @@ export default function TripResults() {
         to: to,
         image: parsedPlan.image || '',
         duration: parsedPlan.duration || '',
-        transportType: parsedPlan.transportType || ''
+        transportType: parsedPlan.transportType || '',
+        title: parsedPlan.title || '',
+        longitude: parsedPlan.longitude || 0,
+        latitude: parsedPlan.latitude || 0
       });
     }
   }, [user, from, to]);
+
+  console.log('Trip Plan:', tripPlan);
 
   const handleClick = async () => {
     if (isSaving || isAdded) return;
@@ -281,6 +289,8 @@ export default function TripResults() {
             disabled={isSaving || isAdded}
             className={`px-5 py-2.5 flex items-center justify-center ${
               isAdded ? 'bg-gray-400 cursor-not-allowed' : 'bg-customGreen'
+            } ${
+              isSaving && 'cursor-progress'
             } text-white rounded-lg transition-all duration-300 font-medium shadow-md cursor-pointer`}
           >
             <Plus className="mr-2 h-5 w-5" />

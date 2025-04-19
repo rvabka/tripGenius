@@ -133,19 +133,13 @@ Nie dodawaj żadnych dodatkowych informacji ani komentarzy. Możesz w niektóryc
 5. LOKALNA KUCHNIA: Polecane dania i restauracje warte odwiedzenia.
 6. PORADY PRAKTYCZNE: Wskazówki dotyczące lokalnej kultury, transportu, bezpieczeństwa i innych praktycznych aspektów.
 7. SZACOWANY BUDŻET: Przybliżony koszt całej podróży z podziałem na główne kategorie.
+8. TYTUŁ PODRÓŻY: Krótki, chwytliwy tytuł dla tej podróży, krótki maks 2-3 słowa
+9. LONGITUDE: Długość geograficzna miejsca docelowego.
+10. LATITUDE: Szerokość geograficzna miejsca docelowego.
 
 Każda sekcja powinna być wyraźnie oznaczona numerem i tytułem (np. "1. PODSUMOWANIE TRASY:"), a następnie zawierać szczegółowe informacje. Używaj formatowania markdown (## dla nagłówków, * dla punktów listy, ** dla wyróżnień).
 
-OPCJONALNIE: Jeśli wolisz, możesz zwrócić odpowiedź jako poprawny obiekt JSON o następującej strukturze:
-{
-  "summary": "tekst w formacie markdown",
-  "transportation": "tekst w formacie markdown",
-  "dailyPlans": "tekst w formacie markdown",
-  "accommodation": "tekst w formacie markdown",
-  "localCuisine": "tekst w formacie markdown",
-  "practicalTips": "tekst w formacie markdown",
-  "estimatedBudget": "tekst w formacie markdown"
-}`;
+`;
 }
 
 function parseTripPlanFromText(text: string): TripPlan {
@@ -156,7 +150,10 @@ function parseTripPlanFromText(text: string): TripPlan {
     'NOCLEGI',
     'LOKALNA KUCHNIA',
     'PORADY PRAKTYCZNE',
-    'SZACOWANY BUDŻET'
+    'SZACOWANY BUDŻET',
+    'TYTUŁ PODRÓŻY',
+    'LONGITUDE',
+    'LATITUDE'
   ];
 
   const sectionMap: Record<string, string> = {};
@@ -221,6 +218,9 @@ function parseTripPlanFromText(text: string): TripPlan {
     localCuisine: sectionMap['LOKALNA KUCHNIA'],
     practicalTips: sectionMap['PORADY PRAKTYCZNE'],
     estimatedBudget: sectionMap['SZACOWANY BUDŻET'],
+    title: sectionMap['TYTUŁ PODRÓŻY'],
+    longitude: parseFloat(sectionMap['LONGITUDE'].replace(/[^\d.-]/g, '')) || 0,
+    latitude: parseFloat(sectionMap['LATITUDE'].replace(/[^\d.-]/g, '')) || 0,
     image: '',
     duration: '',
     transportType: '',
@@ -249,5 +249,8 @@ interface TripPlan {
   image: string;
   duration: string;
   transportType: string;
+  title: string;
+  longitude: number;
+  latitude: number;
   rawContent: string;
 }

@@ -25,8 +25,6 @@ export function TripChart({ tripData }: { tripData: TripPlan[] }) {
 
     setData(newData);
   }, [tripData]);
-
-  console.log(data);
   return (
     <div className="h-[180px] w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -36,22 +34,26 @@ export function TripChart({ tripData }: { tripData: TripPlan[] }) {
             top: 5,
             right: 10,
             left: 10,
-            bottom: 0
+            bottom: 40
           }}
         >
           <XAxis
             dataKey="country"
-            stroke="#ffffff40"
-            fontSize={15}
+            stroke="#ffffff80"
+            fontSize={14}
             tickLine={true}
             axisLine={true}
-            padding={{ left: 20, right: 20 }}
+            padding={{ left: 30, right: 30 }}
+            angle={-45}
+            textAnchor="end"
+            height={60}
+            interval={0}
           />
           <Tooltip
             content={({ active, payload }) => {
               if (active && payload && payload.length) {
                 return (
-                  <div className="rounded-lg border border-[#4a6b4a] bg-[#2c3e2e] p-2 shadow-md">
+                  <div className="rounded-lg border border-[#4a6b4a] bg-[#2c3e2e] p-2 shadow-md ">
                     <div className="grid grid-cols-2 gap-2">
                       <div className="flex flex-col">
                         <span className="text-[0.70rem] uppercase text-[#ffffff80]">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MapPin, Plane, Plus, Map, Compass } from 'lucide-react';
+import { MapPin, Plane, Plus, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TripCard } from '@/components/dashboard/trip-card';
 import { TripStats } from '@/components/dashboard/trip-stats';
@@ -17,6 +17,8 @@ import {
   CarouselItem
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
+import TripProgress from './trip-progress';
+import Map from '@/components/dashboard/map';
 
 export function UserDashboard() {
   const { user } = useUser();
@@ -42,7 +44,8 @@ export function UserDashboard() {
     return fetchedTrips.filter(trip => trip.isCompleted).length.toString();
   };
 
-  console.log(fetchedTrips);
+  const finishedTrips = fetchedTrips.filter(trip => trip.isCompleted);
+  const unFinishedTrips = fetchedTrips.filter(trip => !trip.isCompleted);
 
   return (
     <div className="flex min-h-screen">
@@ -64,7 +67,7 @@ export function UserDashboard() {
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Left Column - Overview */}
-            <div className="col-span-2 space-y-6">
+            <div className="md:col-span-2 col-span-1 space-y-6">
               {/* Overview Card */}
               <div className="rounded-xl bg-[#2c3e2e] p-5 text-white">
                 <div className="mb-4 flex items-center justify-between">
@@ -124,64 +127,53 @@ export function UserDashboard() {
             </div>
 
             {/* Right Column - Upcoming Trips */}
-            <div className="space-y-6">
-              <div className="rounded-xl bg-white p-5 shadow-sm">
+            <div className="space-y-6 w-full">
+              <div className="rounded-xl bg-white p-5 shadow-sm w-full">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-[#2c3e2e]">
                     My Trips
                   </h2>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-[#359572] hover:text-[#2c7a5e]"
-                  >
-                    View All
-                  </Button>
                 </div>
 
                 <Tabs defaultValue="activities">
-                  <TabsList className="mb-4 grid w-full grid-cols-2">
+                  <TabsList className="mb-4 grid gap-6 w-full grid-cols-2">
                     <TabsTrigger value="activities">In Progress</TabsTrigger>
                     <TabsTrigger value="details">Completed</TabsTrigger>
                   </TabsList>
 
-                  {/* <TabsContent value="activities" className="space-y-4">
-                    {trips.map(trip => (
-                      <div
-                        key={trip.id}
-                        className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
-                      >
-                        <div
-                          className="flex h-10 w-10 items-center justify-center rounded-full"
-                          style={{ backgroundColor: trip.color }}
-                        >
-                          <MapPin className="h-5 w-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-medium text-[#2c3e2e]">
-                            {trip.title}
-                          </h3>
-                          <p className="text-xs text-gray-500">
-                            {trip.fromCountry} → {trip.toCountry}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 rounded-full text-gray-400"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
+                  <TabsContent
+                    value="activities"
+                    className="overflow-y-auto max-h-[500px]"
+                  >
+                    {unFinishedTrips.length > 0 ? (
+                      unFinishedTrips.map(trip => (
+                        <TripProgress key={trip.id} trip={trip} />
+                      ))
+                    ) : (
+                      <div className="rounded-lg bg-gray-50 p-4 text-center">
+                        <p className="text-sm text-gray-500">
+                          No upcoming trips yet. Plan your next adventure!
+                        </p>
                       </div>
-                    ))}
-                  </TabsContent> */}
+                    )}
+                  </TabsContent>
 
-                  <TabsContent value="details">
-                    <div className="rounded-lg bg-gray-50 p-4 text-center">
-                      <p className="text-sm text-gray-500">
-                        Select a trip to view details
-                      </p>
-                    </div>
+                  <TabsContent
+                    value="details"
+                    className="overflow-y-auto max-h-[500px]"
+                  >
+                    {finishedTrips.length > 0 ? (
+                      finishedTrips.map(trip => (
+                        <TripProgress key={trip.id} trip={trip} />
+                      ))
+                    ) : (
+                      <div className="rounded-lg bg-gray-50 p-4 text-center">
+                        <p className="text-sm text-gray-500">
+                          No completed trips yet. Start planning your next
+                          adventure!
+                        </p>
+                      </div>
+                    )}
                   </TabsContent>
                 </Tabs>
               </div>
@@ -201,9 +193,9 @@ export function UserDashboard() {
                   </Button>
                 </div>
 
-                <div className="aspect-square rounded-lg bg-gray-100">
-                  <div className="flex h-full items-center justify-center">
-                    <Map className="h-12 w-12 text-gray-300" />
+                <div className="aspect-square rounded-lg shadow-xl">
+                  <div className="rounded-lg h-96 w-full overflow-hidden">
+                    <Map trip={fetchedTrips} />
                   </div>
                 </div>
               </div>

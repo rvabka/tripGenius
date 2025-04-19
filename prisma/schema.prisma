@@ -28,6 +28,10 @@ model TripPlan {
   userId          String
   user            User?     @relation(fields: [userId], references: [externalId])
 
+
+  longitude       Float
+  latitude        Float
+  title           String    @default("")
   isCompleted     Boolean   @default(false)
   image           String
   duration        String
