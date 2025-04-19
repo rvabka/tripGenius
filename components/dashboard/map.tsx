@@ -6,6 +6,7 @@ import { TripPlan } from '@/app/trip-results/page';
 export default function Map({ trip }: { trip: TripPlan[] }) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<maptilersdk.Map | null>(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const defaultCenter = { lng: 1.675063, lat: 47.751569 };
   const defaultZoom = 2;
 
@@ -53,7 +54,7 @@ export default function Map({ trip }: { trip: TripPlan[] }) {
       <div
         ref={mapContainer}
         className="w-full h-full"
-        style={{ minHeight: '400px' }}
+        style={{ minHeight: '450px' }}
       />
     </div>
   );
