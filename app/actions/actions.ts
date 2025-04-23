@@ -37,6 +37,8 @@ export async function saveTripPlan(tripPlan: TripPlan) {
       estimatedBudget: tripPlan.estimatedBudget
     }
   });
+
+  revalidatePath('/saved-trips');
 }
 
 export const getTripPlans = unstable_cache(
