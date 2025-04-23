@@ -43,8 +43,8 @@ export function TripChart({ tripData }: { tripData: TripPlan[] }) {
             fontSize={14}
             tickLine={true}
             axisLine={true}
-            padding={{ left: 30, right: 30 }}
-            angle={-45}
+            padding={{ left: 40, right: 40 }}
+            angle={-55}
             textAnchor="end"
             height={60}
             interval={0}

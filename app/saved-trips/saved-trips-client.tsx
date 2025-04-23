@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MapPin, Plane, Plus, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TripCard } from '@/components/dashboard/trip-card';
@@ -8,12 +8,7 @@ import { TripStats } from '@/components/dashboard/trip-stats';
 import { TripChart } from '@/components/dashboard/trip-chart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
-import {
-  deleteTripPlan,
-  getTripPlans,
-  markAsCompleted
-} from '@/app/actions/actions';
-import { useUser } from '@clerk/nextjs';
+import { deleteTripPlan, markAsCompleted } from '@/app/actions/actions';
 import { TripPlan } from '@/app/trip-results/page';
 import {
   Carousel,
@@ -21,41 +16,25 @@ import {
   CarouselItem
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
-import TripProgress from './trip-progress';
+import TripProgress from '@/components/dashboard/trip-progress';
 import Map from '@/components/dashboard/map';
 import { toast } from 'sonner';
 
-export function UserDashboard() {
-  const { user } = useUser();
+export function UserDashboard({ fetchedTrips }: { fetchedTrips: TripPlan[] }) {
+  const [trips, setTrips] = useState<TripPlan[]>(fetchedTrips);
 
-  const [fetchedTrips, setFetchedTrips] = useState<TripPlan[]>([]);
+  const finishedTrips = trips.filter(trip => trip.isCompleted);
+  const unFinishedTrips = trips.filter(trip => !trip.isCompleted);
 
-  const finishedTrips = fetchedTrips.filter(trip => trip.isCompleted);
-  const unFinishedTrips = fetchedTrips.filter(trip => !trip.isCompleted);
-
-  const [finishedTripsNumber, setFinishedTripsNumber] = useState<number>(0);
-
-  useEffect(() => {
-    async function fetchTrips() {
-      if (user?.id) {
-        try {
-          const data = await getTripPlans(user?.id);
-          setFetchedTrips(data);
-          setFinishedTripsNumber(finishedTrips.length);
-        } catch (error) {
-          console.log('error', error);
-        }
-      }
-    }
-
-    fetchTrips();
-  }, [user, finishedTrips.length]);
+  const [finishedTripsNumber, setFinishedTripsNumber] = useState<number>(
+    finishedTrips.length
+  );
 
   const handleTripCompleted = async (tripId: string) => {
     try {
       if (tripId !== null) {
         await markAsCompleted(tripId);
-        setFetchedTrips(prevTrips => {
+        setTrips(prevTrips => {
           return prevTrips.map(trip => {
             if (trip.id === tripId) {
               return { ...trip, isCompleted: true };
@@ -78,7 +57,7 @@ export function UserDashboard() {
     try {
       if (tripId !== null) {
         await deleteTripPlan(tripId);
-        setFetchedTrips(prevTrips => {
+        setTrips(prevTrips => {
           return prevTrips.filter(trip => trip.id !== tripId);
         });
         toast('Trip plan deleted successfully!⛔');
@@ -147,7 +126,7 @@ export function UserDashboard() {
               <Carousel
                 plugins={[
                   Autoplay({
-                    delay: 5000
+                    delay: 10000
                   })
                 ]}
                 opts={{

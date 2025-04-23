@@ -40,7 +40,6 @@ export async function POST(request: NextRequest) {
     ]);
 
     const text = resultResponse.response.text().trim();
-    console.log('API response:', text.substring(0, 100));
 
     let tripPlan;
     if (text.startsWith('{')) {
@@ -54,7 +53,6 @@ export async function POST(request: NextRequest) {
     }
 
     const imageUrl = imageUrlResponse;
-    console.log('Fetched image URL:', imageUrl);
 
     tripPlan.image = imageUrl;
     tripPlan.duration = preferences.duration;

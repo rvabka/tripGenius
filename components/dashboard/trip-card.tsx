@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {} from '@/components/ui/carousel';
 import { TripPlan } from '@/app/trip-results/page';
+import { toast } from 'sonner';
 
 export function TripCard({
   trip,
@@ -22,6 +23,19 @@ export function TripCard({
   handleTripCompleted: () => void;
   handleTripDeleted: () => void;
 }) {
+  const handleShareTrip = async () => {
+    try {
+      await navigator.clipboard.writeText(
+        `https://trip-genius-9tp9.vercel.app/trip-results?from=${encodeURIComponent(
+          trip.from
+        )}&to=${encodeURIComponent(trip.to)}`
+      );
+      toast('Trip link copied to clipboard!');
+    } catch (error) {
+      toast('Error sharing trip link!');
+      console.error('Error sharing trip:', error);
+    }
+  };
 
   return (
     <div className="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg select-none">
@@ -52,7 +66,9 @@ export function TripCard({
             <DropdownMenuLabel>Trip Options</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Edit Trip</DropdownMenuItem>
-            <DropdownMenuItem>Share Trip</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleShareTrip}>
+              Copy Trip Link
+            </DropdownMenuItem>
             <DropdownMenuItem>Download PDF</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
