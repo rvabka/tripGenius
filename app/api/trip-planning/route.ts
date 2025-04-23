@@ -133,7 +133,7 @@ Nie dodawaj żadnych dodatkowych informacji ani komentarzy. Możesz w niektóryc
 5. LOKALNA KUCHNIA: Polecane dania i restauracje warte odwiedzenia.
 6. PORADY PRAKTYCZNE: Wskazówki dotyczące lokalnej kultury, transportu, bezpieczeństwa i innych praktycznych aspektów.
 7. SZACOWANY BUDŻET: Przybliżony koszt całej podróży z podziałem na główne kategorie.
-8. TYTUŁ PODRÓŻY: Krótki, chwytliwy tytuł dla tej podróży, krótki maks 2-3 słowa
+8. TYTUŁ PODRÓŻY: Krótki, chwytliwy tytuł dla tej podróży, krótki maks 2-3 słowa, nie dodawaj formatowania markdown.
 9. LONGITUDE: Długość geograficzna miejsca docelowego.
 10. LATITUDE: Szerokość geograficzna miejsca docelowego.
 

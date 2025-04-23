@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath, unstable_cache } from 'next/cache';
 import { prisma } from '../lib/prisma';
 import { TripPlan } from '../trip-results/page';
 
@@ -38,15 +39,19 @@ export async function saveTripPlan(tripPlan: TripPlan) {
   });
 }
 
-export async function getTripPlans(userId: string) {
-  const trips = await prisma.tripPlan.findMany({
-    where: {
-      userId: userId
-    }
-  });
+export const getTripPlans = unstable_cache(
+  async (userId: string) => {
+    const trips = await prisma.tripPlan.findMany({
+      where: {
+        userId: userId
+      }
+    });
 
-  return trips;
-}
+    return trips;
+  },
+  ['trip-plans'],
+  { revalidate: false }
+);
 
 export async function markAsCompleted(tripId: string) {
   await prisma.tripPlan.update({
@@ -57,4 +62,16 @@ export async function markAsCompleted(tripId: string) {
       isCompleted: true
     }
   });
+
+  revalidatePath('/saved-trips');
+}
+
+export async function deleteTripPlan(tripId: string) {
+  await prisma.tripPlan.delete({
+    where: {
+      id: tripId
+    }
+  });
+
+  revalidatePath('/saved-trips');
 }

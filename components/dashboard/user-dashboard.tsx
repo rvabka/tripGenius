@@ -8,7 +8,11 @@ import { TripStats } from '@/components/dashboard/trip-stats';
 import { TripChart } from '@/components/dashboard/trip-chart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
-import { getTripPlans } from '@/app/actions/actions';
+import {
+  deleteTripPlan,
+  getTripPlans,
+  markAsCompleted
+} from '@/app/actions/actions';
 import { useUser } from '@clerk/nextjs';
 import { TripPlan } from '@/app/trip-results/page';
 import {
@@ -19,11 +23,17 @@ import {
 import Autoplay from 'embla-carousel-autoplay';
 import TripProgress from './trip-progress';
 import Map from '@/components/dashboard/map';
+import { toast } from 'sonner';
 
 export function UserDashboard() {
   const { user } = useUser();
 
   const [fetchedTrips, setFetchedTrips] = useState<TripPlan[]>([]);
+
+  const finishedTrips = fetchedTrips.filter(trip => trip.isCompleted);
+  const unFinishedTrips = fetchedTrips.filter(trip => !trip.isCompleted);
+
+  const [finishedTripsNumber, setFinishedTripsNumber] = useState<number>(0);
 
   useEffect(() => {
     async function fetchTrips() {
@@ -31,6 +41,7 @@ export function UserDashboard() {
         try {
           const data = await getTripPlans(user?.id);
           setFetchedTrips(data);
+          setFinishedTripsNumber(finishedTrips.length);
         } catch (error) {
           console.log('error', error);
         }
@@ -38,14 +49,45 @@ export function UserDashboard() {
     }
 
     fetchTrips();
-  }, [user]);
+  }, [user, finishedTrips.length]);
 
-  const calculateCompletedTrips = (): string => {
-    return fetchedTrips.filter(trip => trip.isCompleted).length.toString();
+  const handleTripCompleted = async (tripId: string) => {
+    try {
+      if (tripId !== null) {
+        await markAsCompleted(tripId);
+        setFetchedTrips(prevTrips => {
+          return prevTrips.map(trip => {
+            if (trip.id === tripId) {
+              return { ...trip, isCompleted: true };
+            } else {
+              return trip;
+            }
+          });
+        });
+        toast('Trip marked as completed!🎉');
+      }
+    } catch (error) {
+      toast('Error marking trip as completed👍');
+      console.error('Error marking trip as completed:', error);
+    }
+
+    setFinishedTripsNumber(prev => prev + 1);
   };
 
-  const finishedTrips = fetchedTrips.filter(trip => trip.isCompleted);
-  const unFinishedTrips = fetchedTrips.filter(trip => !trip.isCompleted);
+  const handleTripDeleted = async (tripId: string) => {
+    try {
+      if (tripId !== null) {
+        await deleteTripPlan(tripId);
+        setFetchedTrips(prevTrips => {
+          return prevTrips.filter(trip => trip.id !== tripId);
+        });
+        toast('Trip plan deleted successfully!⛔');
+      }
+    } catch (error) {
+      toast('Error deleting trip plan!⛔');
+      console.error('Error deleting trip plan:', error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -94,7 +136,7 @@ export function UserDashboard() {
                   />
                   <TripStats
                     title="Completed"
-                    value={calculateCompletedTrips()}
+                    value={finishedTripsNumber.toString()}
                     label="Trips"
                     icon={<Compass className="h-4 w-4" />}
                   />
@@ -119,7 +161,12 @@ export function UserDashboard() {
                       key={trip.id}
                       className="basis-full md:basis-1/2 shrink-0"
                     >
-                      <TripCard key={trip.id} trip={trip} />
+                      <TripCard
+                        key={trip.id}
+                        trip={trip}
+                        handleTripCompleted={() => handleTripCompleted(trip.id)}
+                        handleTripDeleted={() => handleTripDeleted(trip.id)}
+                      />
                     </CarouselItem>
                   ))}
                 </CarouselContent>
@@ -193,7 +240,7 @@ export function UserDashboard() {
                   </Button>
                 </div>
 
-                <div className="aspect-square rounded-lg shadow-xl">
+                <div className="rounded-lg shadow-xl">
                   <div className="rounded-lg h-96 w-full overflow-hidden">
                     <Map trip={fetchedTrips} />
                   </div>

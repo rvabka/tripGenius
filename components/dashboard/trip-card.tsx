@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import Image from 'next/image';
 import { MapPin, Clock, MoreVertical, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,23 +12,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {} from '@/components/ui/carousel';
 import { TripPlan } from '@/app/trip-results/page';
-import { markAsCompleted } from '@/app/actions/actions';
-import { toast } from 'sonner';
 
-export function TripCard({ trip }: { trip: TripPlan }) {
-  const [isCompleted, setIsCompleted] = useState(trip.isCompleted || false);
-
-  const handleClick = async () => {
-    try {
-      if (trip !== null) {
-        await markAsCompleted(trip.id);
-        setIsCompleted(true);
-        toast('Trip marked as completed!👍');
-      }
-    } catch (error) {
-      console.error('Error marking trip as completed:', error);
-    }
-  };
+export function TripCard({
+  trip,
+  handleTripCompleted,
+  handleTripDeleted
+}: {
+  trip: TripPlan;
+  handleTripCompleted: () => void;
+  handleTripDeleted: () => void;
+}) {
 
   return (
     <div className="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg select-none">
@@ -63,7 +55,10 @@ export function TripCard({ trip }: { trip: TripPlan }) {
             <DropdownMenuItem>Share Trip</DropdownMenuItem>
             <DropdownMenuItem>Download PDF</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-500">
+            <DropdownMenuItem
+              className="text-red-500"
+              onClick={handleTripDeleted}
+            >
               Delete Trip
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -94,12 +89,12 @@ export function TripCard({ trip }: { trip: TripPlan }) {
             Add to Calendar
           </Button>
           <Button
-            disabled={isCompleted}
-            onClick={handleClick}
+            disabled={trip.isCompleted}
+            onClick={handleTripCompleted}
             size="sm"
             className="bg-[#359572] hover:bg-[#2c7a5e] disabled:cursor-not-allowed disabled:bg-gray-400"
           >
-            {isCompleted ? 'Completed' : 'Mark as Completed'}
+            {trip.isCompleted ? 'Completed' : 'Mark as Completed'}
           </Button>
         </div>
       </div>

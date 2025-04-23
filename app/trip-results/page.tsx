@@ -174,7 +174,7 @@ export default function TripResults() {
             {tripPlan.transportType && (
               <div className="bg-white/10 text-white border border-white/20 backdrop-blur-sm px-3 py-1 rounded-full flex items-center text-sm">
                 {getTransportIcon(tripPlan.transportType)}
-                <span className="ml-1">{tripPlan.transportType}</span>
+                <span className="ml-1">{tripPlan.transportType.toLocaleUpperCase()}</span>
               </div>
             )}
           </div>

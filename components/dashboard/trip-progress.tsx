@@ -19,7 +19,7 @@ const TripProgress = ({ trip }: { trip: TripPlan }) => {
           {trip.from} → {trip.to}
         </p>
       </div>
-      <button className="h-8 w-8 bg-gray-100 rounded-full text-gray-400 group-hover:text-accentOrange group-hover:animate-bounce transition-all duration-200 ease-in-out flex items-center justify-center">
+      <button className="h-8 w-8 bg-gray-100 rounded-full text-gray-400 group-hover:text-accentOrange group-hover:animate-bounce transition-all duration-200 ease-in-out flex items-center justify-center cursor-pointer">
         <ChevronRight className="size-4" />
       </button>
     </div>
