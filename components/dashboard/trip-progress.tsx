@@ -1,10 +1,14 @@
 import React from 'react';
 import { ChevronRight, MapPin } from 'lucide-react';
 import { TripPlan } from '@prisma/client';
+import Link from 'next/link';
 
 const TripProgress = ({ trip }: { trip: TripPlan }) => {
   return (
-    <div
+    <Link
+     href={`https://trip-genius-9tp9.vercel.app/trip-results?from=${encodeURIComponent(
+                  trip.from
+                )}&to=${encodeURIComponent(trip.to)}`}
       key={trip.id}
       className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50 cursor-pointer transition-all duration-200 ease-in-out group"
     >
@@ -22,7 +26,7 @@ const TripProgress = ({ trip }: { trip: TripPlan }) => {
       <button className="h-8 w-8 bg-gray-100 rounded-full text-gray-400 group-hover:text-accentOrange group-hover:animate-bounce transition-all duration-200 ease-in-out flex items-center justify-center cursor-pointer">
         <ChevronRight className="size-4" />
       </button>
-    </div>
+    </Link>
   );
 };
 
