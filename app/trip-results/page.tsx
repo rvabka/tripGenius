@@ -174,7 +174,9 @@ export default function TripResults() {
             {tripPlan.transportType && (
               <div className="bg-white/10 text-white border border-white/20 backdrop-blur-sm px-3 py-1 rounded-full flex items-center text-sm">
                 {getTransportIcon(tripPlan.transportType)}
-                <span className="ml-1">{tripPlan.transportType.toLocaleUpperCase()}</span>
+                <span className="ml-1">
+                  {tripPlan.transportType.toLocaleUpperCase()}
+                </span>
               </div>
             )}
           </div>
@@ -201,9 +203,9 @@ export default function TripResults() {
         <div className="p-6">
           {activeTab === 'summary' && (
             <div className="prose prose-slate max-w-none mx-auto text-center">
-              <h2 className="text-2xl font-semibold mb-4">
+              {/* <h2 className="text-2xl font-semibold mb-4">
                 Podsumowanie trasy
-              </h2>
+              </h2> */}
               <div className="text-center mx-auto max-w-3xl">
                 <ReactMarkdown>{tripPlan.summary}</ReactMarkdown>
               </div>
@@ -212,7 +214,7 @@ export default function TripResults() {
 
           {activeTab === 'daily' && (
             <div className="prose prose-slate max-w-none mx-auto text-center">
-              <h2 className="text-2xl font-semibold mb-4">Plan dzienny</h2>
+              {/* <h2 className="text-2xl font-semibold mb-4">Plan dzienny</h2> */}
               <div className="text-left mx-auto max-w-3xl ">
                 <ReactMarkdown>{tripPlan.dailyPlans}</ReactMarkdown>
               </div>
@@ -221,7 +223,7 @@ export default function TripResults() {
 
           {activeTab === 'transport' && (
             <div className="prose prose-slate max-w-none mx-auto text-center">
-              <h2 className="text-2xl font-semibold mb-4">Transport</h2>
+              {/* <h2 className="text-2xl font-semibold mb-4">Transport</h2> */}
               <div className="text-left mx-auto max-w-3xl">
                 <ReactMarkdown>{tripPlan.transportation}</ReactMarkdown>
               </div>
@@ -230,7 +232,7 @@ export default function TripResults() {
 
           {activeTab === 'accommodation' && (
             <div className="prose prose-slate max-w-none mx-auto text-center">
-              <h2 className="text-2xl font-semibold mb-4">Noclegi</h2>
+              {/* <h2 className="text-2xl font-semibold mb-4">Noclegi</h2> */}
               <div className="text-left mx-auto max-w-3xl">
                 <ReactMarkdown>{tripPlan.accommodation}</ReactMarkdown>
               </div>
@@ -239,7 +241,7 @@ export default function TripResults() {
 
           {activeTab === 'cuisine' && (
             <div className="prose prose-slate max-w-none mx-auto text-center">
-              <h2 className="text-2xl font-semibold mb-4">Lokalna kuchnia</h2>
+              {/* <h2 className="text-2xl font-semibold mb-4">Lokalna kuchnia</h2> */}
               <div className="text-left mx-auto max-w-3xl">
                 <ReactMarkdown>{tripPlan.localCuisine}</ReactMarkdown>
               </div>
@@ -248,7 +250,7 @@ export default function TripResults() {
 
           {activeTab === 'tips' && (
             <div className="prose prose-slate max-w-none mx-auto text-center">
-              <h2 className="text-2xl font-semibold mb-4">Porady praktyczne</h2>
+              {/* <h2 className="text-2xl font-semibold mb-4">Porady praktyczne</h2> */}
               <div className="text-left mx-auto max-w-3xl">
                 <ReactMarkdown>{tripPlan.practicalTips}</ReactMarkdown>
               </div>
@@ -257,7 +259,7 @@ export default function TripResults() {
 
           {activeTab === 'budget' && (
             <div className="prose prose-slate max-w-none mx-auto text-center">
-              <h2 className="text-2xl font-semibold mb-4">Szacowany budżet</h2>
+              {/* <h2 className="text-2xl font-semibold mb-4">Szacowany budżet</h2> */}
               <div className="text-left mx-auto max-w-3xl">
                 <ReactMarkdown>{tripPlan.estimatedBudget}</ReactMarkdown>
               </div>
@@ -301,7 +303,7 @@ export default function TripResults() {
               : 'Save trip'}
           </button>
         ) : (
-          <button className="px-5 py-2.5 flex items-center justify-center bg-[#ff6900] text-white rounded-lg hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md">
+          <button className="px-5 py-2.5 flex items-center justify-center bg-[#ff6900] disabled:bg-gray-400 text-white rounded-lg hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md">
             <Link href="/sign-in">Log in to add trip to your account</Link>{' '}
           </button>
         )}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import Loader from '@/components/Loader';
+import { toast } from 'sonner';
 
 interface TripPreferences {
   budget: string;
@@ -30,6 +31,7 @@ export default function TripPlanner() {
 
   const [startLocation, setStartLocation] = useState('');
   const [destination, setDestination] = useState('');
+
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [preferences, setPreferences] =
     useState<TripPreferences>(defaultPreferences);
@@ -81,13 +83,11 @@ export default function TripPlanner() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!startLocation || !destination) {
-      setError('You must provide a starting place and a destination.');
-      return;
-    }
-
-    setError('');
     setIsLoading(true);
+    setError('');
+
+    const isValid = await checkInput(startLocation, destination);
+    if (!isValid) return;
 
     try {
       const response = await fetch('/api/trip-planning', {
@@ -98,7 +98,7 @@ export default function TripPlanner() {
         body: JSON.stringify({
           startLocation,
           destination,
-          preferences,
+          preferences
         })
       });
 
@@ -130,6 +130,53 @@ export default function TripPlanner() {
 
   const selectDestination = (dest: string) => {
     setDestination(dest);
+  };
+
+  const isValidFormat = (str: string) => {
+    const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+,\s?[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/;
+    return regex.test(str);
+  };
+
+  const checkInput = async (startLocation: string, destination: string) => {
+    if (!isValidFormat(startLocation)) {
+      toast('Could not find the start location.🛑');
+      setError('Could not find the start location.🛑');
+      return false;
+    }
+
+    if (!isValidFormat(destination)) {
+      toast('Could not find the destination.🛑');
+      setError('Could not find the destination.🛑');
+      return false;
+    }
+
+    const startLocationResponse = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        startLocation
+      )}&format=json`
+    );
+    const destinationResponse = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        destination
+      )}&format=json`
+    );
+    const startLocationData = await startLocationResponse.json();
+    const destinationData = await destinationResponse.json();
+
+    if (!startLocationData || startLocationData.length === 0) {
+      toast('Could not find the start location.🛑');
+      setError('Could not find the start location.🛑');
+      return false;
+    }
+
+    if (!destinationData || destinationData.length === 0) {
+      toast('Could not find the destination.🛑');
+      setError('Could not find the destination.🛑');
+      return false;
+    }
+
+    toast("Great! Let's plan your trip!🚀");
+    return true;
   };
 
   return (
@@ -273,8 +320,6 @@ export default function TripPlanner() {
                     <option value="weekend">Weekend (2-3 days)</option>
                     <option value="5 dni">Short trip (4-5 days)</option>
                     <option value="7 dni">Week</option>
-                    <option value="14 dni">Two weeks</option>
-                    <option value="miesiąc">Month or more</option>
                   </select>
                 </div>
 

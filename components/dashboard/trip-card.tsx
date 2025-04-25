@@ -13,6 +13,7 @@ import {
 import {} from '@/components/ui/carousel';
 import { TripPlan } from '@/app/trip-results/page';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 export function TripCard({
   trip,
@@ -38,7 +39,12 @@ export function TripCard({
   };
 
   return (
-    <div className="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg select-none">
+    <Link
+      href={`https://trip-genius-9tp9.vercel.app/trip-results?from=${encodeURIComponent(
+        trip.from
+      )}&to=${encodeURIComponent(trip.to)}`}
+      className="block group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg select-none"
+    >
       <div className="relative h-40 w-full overflow-hidden">
         <Image
           src={trip.image || '/placeholder.svg'}
@@ -69,7 +75,6 @@ export function TripCard({
             <DropdownMenuItem onClick={handleShareTrip}>
               Copy Trip Link
             </DropdownMenuItem>
-            <DropdownMenuItem>Download PDF</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-red-500"
@@ -114,6 +119,6 @@ export function TripCard({
           </Button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
