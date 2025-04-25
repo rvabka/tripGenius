@@ -145,12 +145,14 @@ export default function TripPlanner() {
     if (!isValidFormat(startLocation)) {
       toast('Could not find the start location.🛑');
       setError('Could not find the start location.🛑');
+      setIsAdded(false);
       return false;
     }
 
     if (!isValidFormat(destination)) {
       toast('Could not find the destination.🛑');
       setError('Could not find the destination.🛑');
+      setIsAdded(false);
       return false;
     }
 
@@ -170,12 +172,14 @@ export default function TripPlanner() {
     if (!startLocationData || startLocationData.length === 0) {
       toast('Could not find the start location.🛑');
       setError('Could not find the start location.🛑');
+      setIsAdded(false);
       return false;
     }
 
     if (!destinationData || destinationData.length === 0) {
       toast('Could not find the destination.🛑');
       setError('Could not find the destination.🛑');
+      setIsAdded(false);
       return false;
     }
 
