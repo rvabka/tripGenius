@@ -31,6 +31,7 @@ export default function TripPlanner() {
 
   const [startLocation, setStartLocation] = useState('');
   const [destination, setDestination] = useState('');
+  const [isAdded, setIsAdded] = useState(false);
 
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [preferences, setPreferences] =
@@ -82,13 +83,15 @@ export default function TripPlanner() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isAdded || isLoading) return;
 
-    setIsLoading(true);
     setError('');
+    setIsAdded(true);
 
     const isValid = await checkInput(startLocation, destination);
     if (!isValid) return;
 
+    setIsLoading(true);
     try {
       const response = await fetch('/api/trip-planning', {
         method: 'POST',
@@ -120,6 +123,7 @@ export default function TripPlanner() {
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
+        setIsAdded(false);
       } else {
         setError('Wystąpił nieznany błąd');
       }
@@ -411,10 +415,10 @@ export default function TripPlanner() {
         <div className="flex justify-center">
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || isAdded}
             className="px-6 py-3 bg-customGreen text-white font-medium rounded-md hover:bg-[#2f8666] disabled:bg-gray-400 w-full md:w-auto cursor-pointer transition-all duration-200"
           >
-            {isLoading ? 'Planning a trip...' : 'Plan my trip'}
+            {isLoading || isAdded ? 'Planning a trip...' : 'Plan my trip'}
           </button>
           {isLoading && <Loader addInformation={true} />}
         </div>
