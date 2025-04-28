@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { MapPin, Clock, MoreVertical, ArrowRight, Link } from 'lucide-react';
+import { MapPin, Clock, MoreVertical, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -14,6 +14,7 @@ import {} from '@/components/ui/carousel';
 import { TripPlan } from '@/app/trip-results/page';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export function TripCard({
   trip,
@@ -44,7 +45,7 @@ export function TripCard({
     const url = `https://www.google.com/maps/search/?api=1&query=${trip.latitude},${trip.longitude}`;
     window.open(url, '_blank');
   };
-  
+
   const handleEditTrip = () => {
     router.push(
       `https://trip-genius-9tp9.vercel.app/trip-results?from=${encodeURIComponent(
