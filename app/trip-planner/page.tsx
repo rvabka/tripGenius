@@ -144,14 +144,18 @@ export default function TripPlanner() {
   const checkInput = async (startLocation: string, destination: string) => {
     if (!isValidFormat(startLocation)) {
       toast('Could not find the start location.🛑');
-      setError('Could not find the start location.🛑');
+      setError(
+        'You must provide the location in the format 🛑"City, Country"🛑'
+      );
       setIsAdded(false);
       return false;
     }
 
     if (!isValidFormat(destination)) {
       toast('Could not find the destination.🛑');
-      setError('Could not find the destination.🛑');
+      setError(
+        'You must provide the destination in the format 🛑"City, Country"🛑'
+      );
       setIsAdded(false);
       return false;
     }
@@ -171,14 +175,18 @@ export default function TripPlanner() {
 
     if (!startLocationData || startLocationData.length === 0) {
       toast('Could not find the start location.🛑');
-      setError('Could not find the start location.🛑');
+      setError(
+        'You must provide the location in the format 🛑"City, Country"🛑'
+      );
       setIsAdded(false);
       return false;
     }
 
     if (!destinationData || destinationData.length === 0) {
       toast('Could not find the destination.🛑');
-      setError('Could not find the destination.🛑');
+      setError(
+        'You must provide the destination in the format 🛑"City, Country"🛑'
+      );
       setIsAdded(false);
       return false;
     }
@@ -186,6 +194,7 @@ export default function TripPlanner() {
     toast("Great! Let's plan your trip!🚀");
     return true;
   };
+
 
   return (
     <div className="max-w-4xl mx-auto p-6">

@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
-import Loader from '@/components/Loader';
+import MDEditor from '@uiw/react-md-editor';
+import { toast } from 'sonner';
+import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { saveTripPlan } from '../actions/actions';
 import {
@@ -17,10 +19,11 @@ import {
   Car,
   Train,
   Bus,
-  Leaf
+  Leaf,
+  Edit,
+  Save,
+  X
 } from 'lucide-react';
-import { toast } from 'sonner';
-import Link from 'next/link';
 
 export interface TripPlan {
   id: string;
@@ -43,50 +46,59 @@ export interface TripPlan {
   latitude: number;
 }
 
-export default function TripResults() {
-  const searchParams = useSearchParams();
-  const from = searchParams.get('from') || '';
-  const to = searchParams.get('to') || '';
+interface TripViewEditProps {
+  initialTripPlan?: TripPlan;
+  onSave?: (tripPlan: TripPlan) => Promise<void>;
+}
 
+export default function TripViewEdit({
+  initialTripPlan,
+  onSave
+}: TripViewEditProps) {
+  const searchParams = useSearchParams();
   const { user } = useUser();
+
+  const fromParam = searchParams.get('from') || '';
+  const toParam = searchParams.get('to') || '';
+  const isEditMode = searchParams.get('edit') === 'true';
 
   const [tripPlan, setTripPlan] = useState<TripPlan | null>(null);
   const [activeTab, setActiveTab] = useState('summary');
   const [isAdded, setIsAdded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [editing, setEditing] = useState(isEditMode);
 
   useEffect(() => {
-    const savedPlan = localStorage.getItem('tripPlan');
-    if (savedPlan) {
-      const parsedPlan = JSON.parse(savedPlan);
-      console.log(parsedPlan.image);
-      setTripPlan({
-        ...parsedPlan,
-        userId: user?.id,
-        from: from,
-        to: to,
-        image: parsedPlan.image || '',
-        duration: parsedPlan.duration || '',
-        transportType: parsedPlan.transportType || '',
-        title: parsedPlan.title || '',
-        longitude: parsedPlan.longitude || 0,
-        latitude: parsedPlan.latitude || 0
-      });
+    if (initialTripPlan) {
+      setTripPlan(initialTripPlan);
+    } else {
+      const savedPlan = localStorage.getItem('tripPlan');
+      if (savedPlan) {
+        const parsedPlan = JSON.parse(savedPlan);
+        setTripPlan({
+          ...parsedPlan,
+          userId: user?.id,
+          from: fromParam || parsedPlan.from,
+          to: toParam || parsedPlan.to,
+          image: parsedPlan.image || '',
+          duration: parsedPlan.duration || '',
+          transportType: parsedPlan.transportType || '',
+          title: parsedPlan.title || '',
+          longitude: parsedPlan.longitude || 0,
+          latitude: parsedPlan.latitude || 0
+        });
+      }
     }
-  }, [user, from, to]);
+  }, [initialTripPlan, user, fromParam, toParam]);
 
-  console.log('Trip Plan:', tripPlan);
-
-  const handleClick = async () => {
-    if (isSaving || isAdded) return;
+  const handleSaveToDashboard = async () => {
+    if (isSaving || isAdded || !tripPlan) return;
 
     setIsSaving(true);
     try {
-      if (tripPlan !== null) {
-        await saveTripPlan(tripPlan);
-        setIsAdded(true);
-        toast('Trip has been added to your Dashboard☺️');
-      }
+      await saveTripPlan(tripPlan);
+      setIsAdded(true);
+      toast('Trip has been added to your Dashboard☺️');
     } catch (error) {
       console.log(error);
       setIsAdded(true);
@@ -94,6 +106,34 @@ export default function TripResults() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleSaveChanges = async () => {
+    if (!tripPlan) return;
+
+    setIsSaving(true);
+    try {
+      // Save to localStorage
+      localStorage.setItem('tripPlan', JSON.stringify(tripPlan));
+
+      // If onSave prop is provided, call it
+      if (onSave) {
+        await onSave(tripPlan);
+      }
+
+      toast('Trip plan saved successfully!');
+      setEditing(false);
+    } catch (error) {
+      console.error('Error saving trip plan:', error);
+      toast('Failed to save trip plan. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleInputChange = (field: keyof TripPlan, value: string | number) => {
+    if (!tripPlan) return;
+    setTripPlan({ ...tripPlan, [field]: value });
   };
 
   const getTransportIcon = (type: string) => {
@@ -126,42 +166,71 @@ export default function TripResults() {
 
   if (!tripPlan) {
     return (
-      <Loader addInformation={false} addText={'Ładowanie planu podróży...'} />
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-customGreen mx-auto"></div>
+          <p className="mt-4 text-gray-600">Ładowanie planu podróży...</p>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-8">
+      {/* Edit/Save toggle button */}
+      {user?.id && (
+        <div className="flex justify-end">
+          {editing ? (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setEditing(false)}
+                className="px-4 py-2 flex items-center justify-center border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-300"
+              >
+                <X className="mr-2 h-4 w-4" />
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveChanges}
+                disabled={isSaving}
+                className="px-4 py-2 flex items-center justify-center bg-customGreen text-white rounded-lg hover:bg-customGreen/90 transition-all duration-300"
+              >
+                <Save className="mr-2 h-4 w-4" />
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setEditing(true)}
+              className="px-4 py-2 flex items-center justify-center border border-customGreen text-customGreen rounded-lg hover:bg-customGreen/10 transition-all duration-300"
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Trip
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Hero section with image */}
       <div className="relative rounded-xl overflow-hidden h-[300px] md:h-[400px] shadow-xl">
-        {tripPlan.image ? (
-          <Image
-            src={tripPlan.image || '/placeholder.svg'}
-            alt={`${from} to ${to} trip`}
-            fill
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <Image
-            src="/placeholder.svg?height=400&width=1200"
-            alt="Trip placeholder"
-            fill
-            className="object-cover"
-          />
-        )}
+        <Image
+          src={tripPlan.image || '/placeholder.svg?height=400&width=1200'}
+          alt={`${tripPlan.from} to ${tripPlan.to} trip`}
+          fill
+          className="object-cover"
+          priority
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6 text-white">
           <div className="flex items-center gap-2 mb-2">
             <MapPin className="h-5 w-5 text-white/80" />
             <div className="flex items-center text-xl md:text-2xl">
-              <span className="font-medium text-white/90">{from}</span>
+              <span className="font-medium text-white/90">{tripPlan.from}</span>
               <span className="mx-2">→</span>
-              <span className="font-medium text-white/90">{to}</span>
+              <span className="font-medium text-white/90">{tripPlan.to}</span>
             </div>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            Twój plan podróży
+            {tripPlan.title || 'Twój plan podróży'}
           </h1>
 
           <div className="flex flex-wrap gap-3 mt-2">
@@ -183,6 +252,7 @@ export default function TripResults() {
         </div>
       </div>
 
+      {/* Content tabs */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="flex md:justify-center md:items-center overflow-x-auto border-b py-2 gap-0 md:gap-2">
           {tabs.map(tab => (
@@ -198,116 +268,274 @@ export default function TripResults() {
               {tab.label}
             </button>
           ))}
+          {editing && (
+            <button
+              onClick={() => setActiveTab('general')}
+              className={`px-6 py-3 font-medium text-sm whitespace-nowrap transition-colors cursor-pointer rounded-xl ${
+                activeTab === 'general'
+                  ? 'bg-customGreen text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              Ogólne informacje
+            </button>
+          )}
         </div>
 
         <div className="p-6">
-          {activeTab === 'summary' && (
-            <div className="prose prose-slate max-w-none mx-auto text-center">
-              {/* <h2 className="text-2xl font-semibold mb-4">
-                Podsumowanie trasy
-              </h2> */}
-              <div className="text-center mx-auto max-w-3xl">
-                <ReactMarkdown>{tripPlan.summary}</ReactMarkdown>
+          {activeTab === 'summary' &&
+            (editing ? (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Podsumowanie podróży</h2>
+                <MDEditor
+                  value={tripPlan.summary}
+                  onChange={value => handleInputChange('summary', value || '')}
+                  height={500}
+                  className="w-full"
+                />
               </div>
-            </div>
-          )}
-
-          {activeTab === 'daily' && (
-            <div className="prose prose-slate max-w-none mx-auto text-center">
-              {/* <h2 className="text-2xl font-semibold mb-4">Plan dzienny</h2> */}
-              <div className="text-left mx-auto max-w-3xl ">
-                <ReactMarkdown>{tripPlan.dailyPlans}</ReactMarkdown>
+            ) : (
+              <div className="prose prose-slate max-w-none mx-auto text-center">
+                <div className="text-center mx-auto max-w-3xl">
+                  <ReactMarkdown>{tripPlan.summary}</ReactMarkdown>
+                </div>
               </div>
-            </div>
-          )}
+            ))}
 
-          {activeTab === 'transport' && (
-            <div className="prose prose-slate max-w-none mx-auto text-center">
-              {/* <h2 className="text-2xl font-semibold mb-4">Transport</h2> */}
-              <div className="text-left mx-auto max-w-3xl">
-                <ReactMarkdown>{tripPlan.transportation}</ReactMarkdown>
+          {activeTab === 'daily' &&
+            (editing ? (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Plan dzienny</h2>
+                <MDEditor
+                  value={tripPlan.dailyPlans}
+                  onChange={value =>
+                    handleInputChange('dailyPlans', value || '')
+                  }
+                  height={500}
+                  className="w-full"
+                />
               </div>
-            </div>
-          )}
-
-          {activeTab === 'accommodation' && (
-            <div className="prose prose-slate max-w-none mx-auto text-center">
-              {/* <h2 className="text-2xl font-semibold mb-4">Noclegi</h2> */}
-              <div className="text-left mx-auto max-w-3xl">
-                <ReactMarkdown>{tripPlan.accommodation}</ReactMarkdown>
+            ) : (
+              <div className="prose prose-slate max-w-none mx-auto text-center">
+                <div className="text-left mx-auto max-w-3xl">
+                  <ReactMarkdown>{tripPlan.dailyPlans}</ReactMarkdown>
+                </div>
               </div>
-            </div>
-          )}
+            ))}
 
-          {activeTab === 'cuisine' && (
-            <div className="prose prose-slate max-w-none mx-auto text-center">
-              {/* <h2 className="text-2xl font-semibold mb-4">Lokalna kuchnia</h2> */}
-              <div className="text-left mx-auto max-w-3xl">
-                <ReactMarkdown>{tripPlan.localCuisine}</ReactMarkdown>
+          {activeTab === 'transport' &&
+            (editing ? (
+              <div className="prose space-y-4">
+                <h2 className="text-xl font-semibold">Transport</h2>
+                <MDEditor
+                  value={tripPlan.transportation}
+                  onChange={value =>
+                    handleInputChange('transportation', value || '')
+                  }
+                  height={500}
+                  className="w-full"
+                />
               </div>
-            </div>
-          )}
-
-          {activeTab === 'tips' && (
-            <div className="prose prose-slate max-w-none mx-auto text-center">
-              {/* <h2 className="text-2xl font-semibold mb-4">Porady praktyczne</h2> */}
-              <div className="text-left mx-auto max-w-3xl">
-                <ReactMarkdown>{tripPlan.practicalTips}</ReactMarkdown>
+            ) : (
+              <div className="prose prose-slate max-w-none mx-auto text-center">
+                <div className="text-left mx-auto max-w-3xl">
+                  <ReactMarkdown>{tripPlan.transportation}</ReactMarkdown>
+                </div>
               </div>
-            </div>
-          )}
+            ))}
 
-          {activeTab === 'budget' && (
-            <div className="prose prose-slate max-w-none mx-auto text-center">
-              {/* <h2 className="text-2xl font-semibold mb-4">Szacowany budżet</h2> */}
-              <div className="text-left mx-auto max-w-3xl">
-                <ReactMarkdown>{tripPlan.estimatedBudget}</ReactMarkdown>
+          {activeTab === 'accommodation' &&
+            (editing ? (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Noclegi</h2>
+                <MDEditor
+                  value={tripPlan.accommodation}
+                  onChange={value =>
+                    handleInputChange('accommodation', value || '')
+                  }
+                  height={500}
+                  className="w-full"
+                />
+              </div>
+            ) : (
+              <div className="prose prose-slate max-w-none mx-auto text-center">
+                <div className="text-left mx-auto max-w-3xl">
+                  <ReactMarkdown>{tripPlan.accommodation}</ReactMarkdown>
+                </div>
+              </div>
+            ))}
+
+          {activeTab === 'cuisine' &&
+            (editing ? (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Kuchnia lokalna</h2>
+                <MDEditor
+                  value={tripPlan.localCuisine}
+                  onChange={value =>
+                    handleInputChange('localCuisine', value || '')
+                  }
+                  height={500}
+                  className="w-full"
+                />
+              </div>
+            ) : (
+              <div className="prose prose-slate max-w-none mx-auto text-center">
+                <div className="text-left mx-auto max-w-3xl">
+                  <ReactMarkdown>{tripPlan.localCuisine}</ReactMarkdown>
+                </div>
+              </div>
+            ))}
+
+          {activeTab === 'tips' &&
+            (editing ? (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Praktyczne porady</h2>
+                <MDEditor
+                  value={tripPlan.practicalTips}
+                  onChange={value =>
+                    handleInputChange('practicalTips', value || '')
+                  }
+                  height={500}
+                  className="w-full"
+                />
+              </div>
+            ) : (
+              <div className="prose prose-slate max-w-none mx-auto text-center">
+                <div className="text-left mx-auto max-w-3xl">
+                  <ReactMarkdown>{tripPlan.practicalTips}</ReactMarkdown>
+                </div>
+              </div>
+            ))}
+
+          {activeTab === 'budget' &&
+            (editing ? (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Szacowany budżet</h2>
+                <MDEditor
+                  value={tripPlan.estimatedBudget}
+                  onChange={value =>
+                    handleInputChange('estimatedBudget', value || '')
+                  }
+                  height={500}
+                  className="w-full"
+                />
+              </div>
+            ) : (
+              <div className="prose prose-slate max-w-none mx-auto text-center">
+                <div className="text-left mx-auto max-w-3xl">
+                  <ReactMarkdown>{tripPlan.estimatedBudget}</ReactMarkdown>
+                </div>
+              </div>
+            ))}
+
+          {activeTab === 'general' && editing && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="font-medium text-lg">Podstawowe informacje</h3>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      URL obrazu
+                    </label>
+                    <input
+                      type="text"
+                      value={tripPlan.image || ''}
+                      onChange={e => handleInputChange('image', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-customGreen focus:border-customGreen"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="font-medium text-lg">Lokalizacja</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Długość geograficzna
+                      </label>
+                      <input
+                        type="number"
+                        value={tripPlan.longitude || 0}
+                        onChange={e =>
+                          handleInputChange(
+                            'longitude',
+                            Number.parseFloat(e.target.value)
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-customGreen focus:border-customGreen"
+                        step="0.000001"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Szerokość geograficzna
+                      </label>
+                      <input
+                        type="number"
+                        value={tripPlan.latitude || 0}
+                        onChange={e =>
+                          handleInputChange(
+                            'latitude',
+                            Number.parseFloat(e.target.value)
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-customGreen focus:border-customGreen"
+                        step="0.000001"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Action buttons */}
-      <div className="flex flex-wrap justify-center items-center gap-4">
-        <Link
-          href="/trip-planner"
-          className="px-5 py-2.5 flex items-center justify-center border-2 border-[#1d3557] text-[#1d3557] rounded-lg hover:bg-[#1d3557]/10 transition-all duration-300 group font-medium"
-        >
-          <FilePlus className="mr-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
-          Create another trip
-        </Link>
-        <button
-          onClick={() => window.print()}
-          className="px-5 py-2.5 flex items-center justify-center bg-[#ff6900] text-white rounded-lg hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md"
-        >
-          <Printer className="mr-2 h-5 w-5 group-hover:translate-y-0.5 transition-transform" />
-          Print trip plan
-        </button>
-
-        {user?.id ? (
-          <button
-            onClick={handleClick}
-            disabled={isSaving || isAdded}
-            className={`px-5 py-2.5 flex items-center justify-center ${
-              isAdded ? 'bg-gray-400 cursor-not-allowed' : 'bg-customGreen'
-            } ${
-              isSaving && 'cursor-progress'
-            } text-white rounded-lg transition-all duration-300 font-medium shadow-md cursor-pointer`}
+      {/* Action buttons - only show in view mode */}
+      {!editing && (
+        <div className="flex flex-wrap justify-center items-center gap-4">
+          <Link
+            href="/trip-planner"
+            className="px-5 py-2.5 flex items-center justify-center border-2 border-[#1d3557] text-[#1d3557] rounded-lg hover:bg-[#1d3557]/10 transition-all duration-300 group font-medium"
           >
-            <Plus className="mr-2 h-5 w-5" />
-            {isAdded
-              ? 'Trip already saved'
-              : isSaving
-              ? 'Saving...'
-              : 'Save trip'}
+            <FilePlus className="mr-2 h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+            Create another trip
+          </Link>
+          <button
+            onClick={() => window.print()}
+            className="px-5 py-2.5 flex items-center justify-center bg-[#ff6900] text-white rounded-lg hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md"
+          >
+            <Printer className="mr-2 h-5 w-5 group-hover:translate-y-0.5 transition-transform" />
+            Print trip plan
           </button>
-        ) : (
-          <button className="px-5 py-2.5 flex items-center justify-center bg-[#ff6900] disabled:bg-gray-400 text-white rounded-lg hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md">
-            <Link href="/sign-in">Log in to add trip to your account</Link>{' '}
-          </button>
-        )}
-      </div>
+
+          {user?.id ? (
+            <button
+              onClick={handleSaveToDashboard}
+              disabled={isSaving || isAdded}
+              className={`px-5 py-2.5 flex items-center justify-center ${
+                isAdded ? 'bg-gray-400 cursor-not-allowed' : 'bg-customGreen'
+              } ${
+                isSaving && 'cursor-progress'
+              } text-white rounded-lg transition-all duration-300 font-medium shadow-md cursor-pointer`}
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              {isAdded
+                ? 'Trip already saved'
+                : isSaving
+                ? 'Saving...'
+                : 'Save trip'}
+            </button>
+          ) : (
+            <button className="px-5 py-2.5 flex items-center justify-center bg-[#ff6900] disabled:bg-gray-400 text-white rounded-lg hover:bg-[#ff6900]/90 transition-all duration-300 group cursor-pointer font-medium shadow-md">
+              <Link href="/sign-in">Log in to add trip to your account</Link>{' '}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

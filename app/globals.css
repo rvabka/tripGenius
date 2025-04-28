@@ -173,11 +173,7 @@ input[type='date'].date-input--has-value::-webkit-datetime-edit-year-field {
   --color-accentOrange: #ff6900;
 }
 
-.prose {
-  max-width: 65ch;
-  color: #333;
-  line-height: 1.6;
-}
+
 
 /* Nagłówki */
 .prose h2 {

@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { MapPin, Clock, MoreVertical, ArrowRight } from 'lucide-react';
+import { MapPin, Clock, MoreVertical, ArrowRight, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -13,7 +13,7 @@ import {
 import {} from '@/components/ui/carousel';
 import { TripPlan } from '@/app/trip-results/page';
 import { toast } from 'sonner';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export function TripCard({
   trip,
@@ -24,6 +24,8 @@ export function TripCard({
   handleTripCompleted: () => void;
   handleTripDeleted: () => void;
 }) {
+  const router = useRouter();
+
   const handleShareTrip = async () => {
     try {
       await navigator.clipboard.writeText(
@@ -36,6 +38,19 @@ export function TripCard({
       toast('Error sharing trip link!👎');
       console.error('Error sharing trip:', error);
     }
+  };
+
+  const handleOpenMaps = () => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${trip.latitude},${trip.longitude}`;
+    window.open(url, '_blank');
+  };
+  
+  const handleEditTrip = () => {
+    router.push(
+      `https://trip-genius-9tp9.vercel.app/trip-results?from=${encodeURIComponent(
+        trip.from
+      )}&to=${encodeURIComponent(trip.to)}&edit=true`
+    );
   };
 
   return (
@@ -69,9 +84,14 @@ export function TripCard({
           >
             <DropdownMenuLabel>Trip Options</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit Trip</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleEditTrip}>
+              Edit Trip
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleShareTrip}>
               Copy Trip Link
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleOpenMaps}>
+              Open in Maps
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -100,13 +120,13 @@ export function TripCard({
           </div>
         </div>
         <div className="flex flex-col justify-between gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             className="border-[#4a6b4a] text-[#4a6b4a] hover:bg-[#4a6b4a]/10 cursor-pointer"
           >
             Add to Calendar
-          </Button>
+          </Button> */}
           <div className="flex items-center justify-between gap-2">
             <Button
               disabled={trip.isCompleted}
