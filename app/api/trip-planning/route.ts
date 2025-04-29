@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
 async function fetchDestinationImage(destination: string): Promise<string> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 4000);
@@ -102,54 +103,52 @@ function constructTripPlanningPrompt(
   preferences: TripPreferences
 ): string {
   const {
-    budget = 'średni',
-    duration = '7 dni',
+    budget = 'medium',
+    duration = '7 days',
     interests = [],
-    travelStyle = 'standardowy',
-    transportationType = 'dowolny'
+    travelStyle = 'standard',
+    transportationType = 'any'
   } = preferences;
 
-  return `Zaplanuj podróż z ${startLocation} do ${destination}.
+  return `Plan a trip from ${startLocation} to ${destination}.
 
-DANE PODRÓŻY:
-- Miejsce startu: ${startLocation}
-- Cel podróży: ${destination}
-- Budżet: ${budget}
-- Czas trwania: ${duration}
-- Zainteresowania: ${interests.join(', ') || 'różnorodne atrakcje'}
-- Styl podróżowania: ${travelStyle}
-- Preferowany transport: ${transportationType}
+TRIP DETAILS:
+- Start location: ${startLocation}
+- Destination: ${destination}
+- Budget: ${budget}
+- Duration: ${duration}
+- Interests: ${interests.join(', ') || 'varied attractions'}
+- Travel style: ${travelStyle}
+- Preferred transportation: ${transportationType}
 
-Zwróć szczegółowy plan podróży w następującym formacie (każda sekcja powinna być sformatowana z użyciem markdown dla lepszej czytelności):
+Return a detailed travel plan in the following format (each section should be formatted using markdown for better readability):
 
-Nie dodawaj żadnych dodatkowych informacji ani komentarzy. Możesz w niektórych miejscach dodać emotki.
+Do not add any additional information or comments. You may add emojis in appropriate places.
 
-1. PODSUMOWANIE TRASY: Krótki opis trasy podróży, główne punkty i ogólne zalecenia.
-2. TRANSPORT: Najlepsze opcje transportu między lokalizacjami (samolot, pociąg, autobus, samochód) z przybliżonymi cenami i czasem podróży.
-3. PLAN DZIENNY: Szczegółowy plan dla każdego dnia podróży, zawierający miejsca do odwiedzenia, atrakcje i rekomendowane lokalne doświadczenia.
-4. NOCLEGI: Rekomendowane miejsca pobytu w różnych przedziałach cenowych.
-5. LOKALNA KUCHNIA: Polecane dania i restauracje warte odwiedzenia.
-6. PORADY PRAKTYCZNE: Wskazówki dotyczące lokalnej kultury, transportu, bezpieczeństwa i innych praktycznych aspektów.
-7. SZACOWANY BUDŻET: Przybliżony koszt całej podróży z podziałem na główne kategorie.
-8. TYTUŁ PODRÓŻY: Krótki, chwytliwy tytuł dla tej podróży, krótki maks 2-3 słowa, nie dodawaj formatowania markdown.
-9. LONGITUDE: Długość geograficzna miejsca docelowego.
-10. LATITUDE: Szerokość geograficzna miejsca docelowego.
+1. TRIP SUMMARY: A short overview of the route, main highlights, and general advice.
+2. TRANSPORTATION: Best travel options between locations (plane, train, bus, car) with approximate prices and travel time.
+3. DAILY PLAN: Detailed day-by-day itinerary including places to visit, attractions, and recommended local experiences.
+4. ACCOMMODATION: Recommended places to stay in different price ranges.
+5. LOCAL CUISINE: Suggested dishes and restaurants worth visiting.
+6. PRACTICAL TIPS: Local culture advice, transportation, safety, and other practical aspects.
+7. ESTIMATED BUDGET: Approximate total trip cost broken down by category.
+8. TRIP TITLE: A short catchy title for this trip (2-3 words max, no markdown formatting).
+9. LONGITUDE: Longitude of the destination.
+10. LATITUDE: Latitude of the destination.
 
-Każda sekcja powinna być wyraźnie oznaczona numerem i tytułem (np. "1. PODSUMOWANIE TRASY:"), a następnie zawierać szczegółowe informacje. Używaj formatowania markdown (## dla nagłówków, * dla punktów listy, ** dla wyróżnień).
-
-`;
+Each section should be clearly labeled with its number and title (e.g., "1. TRIP SUMMARY:"), followed by detailed content. Use markdown formatting (## for headings, * for lists, ** for bold).`;
 }
 
 function parseTripPlanFromText(text: string): TripPlan {
   const sectionTitles = [
-    'PODSUMOWANIE TRASY',
-    'TRANSPORT',
-    'PLAN DZIENNY',
-    'NOCLEGI',
-    'LOKALNA KUCHNIA',
-    'PORADY PRAKTYCZNE',
-    'SZACOWANY BUDŻET',
-    'TYTUŁ PODRÓŻY',
+    'TRIP SUMMARY',
+    'TRANSPORTATION',
+    'DAILY PLAN',
+    'ACCOMMODATION',
+    'LOCAL CUISINE',
+    'PRACTICAL TIPS',
+    'ESTIMATED BUDGET',
+    'TRIP TITLE',
     'LONGITUDE',
     'LATITUDE'
   ];
@@ -181,7 +180,7 @@ function parseTripPlanFromText(text: string): TripPlan {
       const content = text.substring(startPos, endPos).trim();
 
       const matchingTitle = sectionTitles.find(title =>
-        currentHeader.title.includes(title)
+        currentHeader.title.toUpperCase().includes(title)
       );
 
       if (matchingTitle) {
@@ -209,14 +208,14 @@ function parseTripPlanFromText(text: string): TripPlan {
   }
 
   const tripPlan: TripPlan = {
-    summary: sectionMap['PODSUMOWANIE TRASY'],
-    transportation: sectionMap['TRANSPORT'],
-    dailyPlans: sectionMap['PLAN DZIENNY'],
-    accommodation: sectionMap['NOCLEGI'],
-    localCuisine: sectionMap['LOKALNA KUCHNIA'],
-    practicalTips: sectionMap['PORADY PRAKTYCZNE'],
-    estimatedBudget: sectionMap['SZACOWANY BUDŻET'],
-    title: sectionMap['TYTUŁ PODRÓŻY'],
+    summary: sectionMap['TRIP SUMMARY'],
+    transportation: sectionMap['TRANSPORTATION'],
+    dailyPlans: sectionMap['DAILY PLAN'],
+    accommodation: sectionMap['ACCOMMODATION'],
+    localCuisine: sectionMap['LOCAL CUISINE'],
+    practicalTips: sectionMap['PRACTICAL TIPS'],
+    estimatedBudget: sectionMap['ESTIMATED BUDGET'],
+    title: sectionMap['TRIP TITLE'],
     longitude: parseFloat(sectionMap['LONGITUDE'].replace(/[^\d.-]/g, '')) || 0,
     latitude: parseFloat(sectionMap['LATITUDE'].replace(/[^\d.-]/g, '')) || 0,
     image: '',

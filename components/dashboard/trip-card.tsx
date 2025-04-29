@@ -45,13 +45,12 @@ export function TripCard({
     const url = `https://www.google.com/maps/search/?api=1&query=${trip.latitude},${trip.longitude}`;
     window.open(url, '_blank');
   };
-  // http://localhost:3000/saved-trips
 
   const handleEditTrip = () => {
     localStorage.clear();
     localStorage.setItem('tripPlan', JSON.stringify(trip));
     router.push(
-      `http://localhost:3000/trip-results?from=${encodeURIComponent(
+      `https://trip-genius-9tp9.vercel.app/trip-results?from=${encodeURIComponent(
         trip.from
       )}&to=${encodeURIComponent(trip.to)}&edit=true`
     );
@@ -124,13 +123,6 @@ export function TripCard({
           </div>
         </div>
         <div className="flex flex-col justify-between gap-2">
-          {/* <Button
-            variant="outline"
-            size="sm"
-            className="border-[#4a6b4a] text-[#4a6b4a] hover:bg-[#4a6b4a]/10 cursor-pointer"
-          >
-            Add to Calendar
-          </Button> */}
           <div className="flex items-center justify-between gap-2">
             <Button
               disabled={trip.isCompleted}
