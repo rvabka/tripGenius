@@ -77,3 +77,29 @@ export async function deleteTripPlan(tripId: string) {
 
   revalidatePath('/saved-trips');
 }
+
+export async function updateTripPlan(tripId: string, tripPlan: TripPlan) {
+  await prisma.tripPlan.update({
+    where: {
+      id: tripId
+    },
+    data: {
+      userId: tripPlan.userId,
+      from: tripPlan.from,
+      to: tripPlan.to,
+      image: tripPlan.image,
+      duration: tripPlan.duration,
+      transportType: tripPlan.transportType,
+      title: tripPlan.title,
+      longitude: tripPlan.longitude,
+      latitude: tripPlan.latitude,
+      summary: tripPlan.summary,
+      transportation: tripPlan.transportation,
+      dailyPlans: tripPlan.dailyPlans,
+      accommodation: tripPlan.accommodation,
+      localCuisine: tripPlan.localCuisine,
+      practicalTips: tripPlan.practicalTips,
+      estimatedBudget: tripPlan.estimatedBudget
+    }
+  });
+}

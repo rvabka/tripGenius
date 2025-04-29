@@ -45,10 +45,13 @@ export function TripCard({
     const url = `https://www.google.com/maps/search/?api=1&query=${trip.latitude},${trip.longitude}`;
     window.open(url, '_blank');
   };
+  // http://localhost:3000/saved-trips
 
   const handleEditTrip = () => {
+    localStorage.clear();
+    localStorage.setItem('tripPlan', JSON.stringify(trip));
     router.push(
-      `https://trip-genius-9tp9.vercel.app/trip-results?from=${encodeURIComponent(
+      `http://localhost:3000/trip-results?from=${encodeURIComponent(
         trip.from
       )}&to=${encodeURIComponent(trip.to)}&edit=true`
     );

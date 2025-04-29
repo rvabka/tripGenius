@@ -12,12 +12,15 @@ const EditableMarkdown = ({ content, title }: EditableMarkdownProps) => {
   return (
     <>
       <h1>{title}</h1>
-      <div data-color-mode="light" className="prose prose-slate ">
+      <div data-color-mode="light">
         <MDEditor
           value={value}
           onChange={newValue => setValue(newValue || '')}
           height={500}
-          className="w-full"
+          className="w-full flex flex-col md:flex-row"
+          previewOptions={{
+            className: 'md-editor-preview-light'
+          }}
         />
       </div>
     </>

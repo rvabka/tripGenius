@@ -8,7 +8,7 @@ import MDEditor from '@uiw/react-md-editor';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
-import { saveTripPlan } from '../actions/actions';
+import { saveTripPlan, updateTripPlan } from '../actions/actions';
 import {
   FilePlus,
   Plus,
@@ -24,6 +24,7 @@ import {
   Save,
   X
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export interface TripPlan {
   id: string;
@@ -91,6 +92,8 @@ export default function TripViewEdit({
     }
   }, [initialTripPlan, user, fromParam, toParam]);
 
+  console.log('Trip Plan:', tripPlan);
+
   const handleSaveToDashboard = async () => {
     if (isSaving || isAdded || !tripPlan) return;
 
@@ -113,19 +116,18 @@ export default function TripViewEdit({
 
     setIsSaving(true);
     try {
-      // Save to localStorage
+      updateTripPlan(tripPlan.id, tripPlan);
       localStorage.setItem('tripPlan', JSON.stringify(tripPlan));
 
-      // If onSave prop is provided, call it
       if (onSave) {
         await onSave(tripPlan);
       }
 
-      toast('Trip plan saved successfully!');
+      toast('Trip plan saved successfully!☺️');
       setEditing(false);
     } catch (error) {
+      toast('Failed to save trip plan. Please try again.🛑');
       console.error('Error saving trip plan:', error);
-      toast('Failed to save trip plan. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -182,30 +184,30 @@ export default function TripViewEdit({
         <div className="flex justify-end">
           {editing ? (
             <div className="flex gap-2">
-              <button
+              <Button
                 onClick={() => setEditing(false)}
-                className="px-4 py-2 flex items-center justify-center border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-300"
+                className="px-6 py-3 text-white bg-red-700 font-medium rounded-md hover:bg-red-800 disabled:bg-gray-400 w-full md:w-auto cursor-pointer transition-all duration-200"
               >
                 <X className="mr-2 h-4 w-4" />
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleSaveChanges}
                 disabled={isSaving}
-                className="px-4 py-2 flex items-center justify-center bg-customGreen text-white rounded-lg hover:bg-customGreen/90 transition-all duration-300"
+                className="px-6 py-3 bg-customGreen text-white font-medium rounded-md hover:bg-[#2f8666] disabled:bg-gray-400 w-full md:w-auto cursor-pointer transition-all duration-200"
               >
                 <Save className="mr-2 h-4 w-4" />
                 {isSaving ? 'Saving...' : 'Save Changes'}
-              </button>
+              </Button>
             </div>
           ) : (
-            <button
+            <Button
               onClick={() => setEditing(true)}
-              className="px-4 py-2 flex items-center justify-center border border-customGreen text-customGreen rounded-lg hover:bg-customGreen/10 transition-all duration-300"
+              className="px-6 py-3 bg-customGreen text-white font-medium rounded-md hover:bg-[#2f8666] disabled:bg-gray-400 w-full md:w-auto cursor-pointer transition-all duration-200"
             >
               <Edit className="mr-2 h-4 w-4" />
               Edit Trip
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -325,7 +327,7 @@ export default function TripViewEdit({
 
           {activeTab === 'transport' &&
             (editing ? (
-              <div className="prose space-y-4">
+              <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Transport</h2>
                 <MDEditor
                   value={tripPlan.transportation}

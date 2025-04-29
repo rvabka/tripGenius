@@ -17,7 +17,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: 'tripGenius🌍',
-  description: 'Your Journey, Your Way – Plan Smarter with TripGenius!'
+  description: 'Your Journey, Your Way to Plan Smarter with TripGenius!'
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" data-color-mode="light">
         <body className={poppins.className}>
           <BackgroundWrapper>
             <main>
