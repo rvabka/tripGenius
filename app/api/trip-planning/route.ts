@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
       geminiModel.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.2,
-          topK: 5,
+          temperature: 0.1,
+          topK: 3,
           topP: 0.1
         }
       }),
