@@ -31,9 +31,9 @@ export async function POST(request: NextRequest) {
       geminiModel.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.1,
-          topK: 3,
-          topP: 0.1
+          temperature: 0.05,
+          topK: 1,
+          topP: 0.1,
         }
       }),
       fetchDestinationImage(destination)
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
 async function fetchDestinationImage(destination: string): Promise<string> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 4000);
+  const timeout = setTimeout(() => controller.abort(), 2000);
 
   try {
     const response = await fetch(
@@ -121,7 +121,7 @@ TRIP DETAILS:
 - Travel style: ${travelStyle}
 - Preferred transportation: ${transportationType}
 
-Return a detailed travel plan in the following format (each section should be formatted using markdown for better readability):
+Return a travel plan in the following format (each section should be formatted using markdown for better readability):
 
 Do not add any additional information or comments. You may add emojis in appropriate places.
 
